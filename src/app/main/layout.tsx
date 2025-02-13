@@ -15,13 +15,6 @@ export default function MainLayout({ children }) {
     <>
       {category.map((elm, index) => {
         return (
-          // <button
-          //   className={`${filter[index] ? "text-red-600" : "text-green-600"}`}
-          //   key={index}
-          //   onClick={() => handleClick(index)}
-          // >
-          //   {elm}
-          // </button>
           <CategroyButton
             key={index}
             filter={filter}
