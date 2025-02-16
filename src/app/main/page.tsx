@@ -1,6 +1,6 @@
-import Link from "next/link";
 import Writing from "../components/Writing/writing";
 import { Client } from "@notionhq/client";
+
 
 const notionKey = "secret_4xikJwE4vtTmD0zpD8vYtT6oTxuyygNRd9eLfdTO6nG";
 const notionDatabaseKey = "b066078bdd874b6099d7b0549cb4437d";
@@ -15,18 +15,18 @@ export default async function Main() {
       return response.results;
     } catch (err) {
       console.error("Error retrieving data:", err);
-      throw new Error("Failed to fetch Notion data."); // 오류를 던져 호출한 곳에서 처리하도록 함
-    }
-  }
-  async function getUserName(userId: string) {
-    try {
-      const response = await notion.users.retrieve({ user_id: userId });
-      return response.name;
-    } catch (err) {
-      console.error("Error retrieving data:", err);
       throw new Error("Failed to fetch Notion data.");
     }
   }
+  // async function getUserName(userId: string) {
+  //   try {
+  //     const response = await notion.users.retrieve({ user_id: userId });
+  //     return response.name;
+  //   } catch (err) {
+  //     console.error("Error retrieving data:", err);
+  //     throw new Error("Failed to fetch Notion data.");
+  //   }
+  // }
 
   async function getBlockChildren(blockId: string) {
     try {
@@ -40,7 +40,7 @@ export default async function Main() {
 
   const data = await getNotionData();
   const scheme_text: string[] = [];
-
+  // const user: string[] = [];
   for (let item of data) {
     try {
       const blockChildren = await getBlockChildren(item.id);
@@ -61,19 +61,28 @@ export default async function Main() {
       console.log(err);
     }
   }
-
+  // for (let itme of data) {
+  //   try {
+  //     const userId = itme.created_by.id;
+  //     const userName = await getUserName(userId);
+  //     if (userName) user.push(userName);
+  //     else user.push("Unknown User");
+  //   } catch (err) {
+  //     console.log(`Fail to find user:${err}`);
+  //   }
+  // }
   return data.map((elm, index) => {
     const title = elm.properties["Name"].title[0].plain_text;
     const pageId = elm.id;
     const createdTime = elm.created_time;
     const createdUserId = elm.created_by.id;
-
+    const createdTimeSliced = createdTime.slice(0, 10);
     return (
       <Writing
         key={pageId}
         title={title}
         content={scheme_text[index]}
-        date={createdTime}
+        date={createdTimeSliced}
         writer={createdUserId}
         pageId={pageId}
       />

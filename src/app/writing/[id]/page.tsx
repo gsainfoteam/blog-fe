@@ -34,7 +34,6 @@ export default async function DetailPage(props) {
     .use(stringify)
     .process(markdown);
   const htmlString = html.toString();
-  console.log(htmlString);
   return (
     <div>
       <div dangerouslySetInnerHTML={{__html: htmlString}}/>
