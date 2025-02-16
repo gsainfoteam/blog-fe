@@ -11,10 +11,17 @@
   "dependencies": {
     "@notionhq/client": "^2.2.15",
     "next": "15.1.6",
-    "notion-client": "^7.1.6",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-notion-x": "^7.2.6"
+    "notion-to-md": "^3.1.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "rehype": "^13.0.2",
+    "rehype-react": "^8.0.0",
+    "rehype-stringify": "^10.0.1",
+    "remark": "^15.0.1",
+    "remark-html": "^16.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.1",
+    "unified": "^11.0.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

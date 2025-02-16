@@ -24,7 +24,8 @@ export default function MainLayout({ children }) {
           />
         );
       })}
-      {children}
+      <div className="flex-col">{children}</div>
+      
     </>
   );
 }

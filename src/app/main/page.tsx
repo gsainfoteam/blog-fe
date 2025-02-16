@@ -27,15 +27,7 @@ export default async function Main() {
       throw new Error("Failed to fetch Notion data.");
     }
   }
-  async function getBlock(blockId: string) {
-    try {
-      const response = await notion.blocks.retrieve({ block_id: blockId });
-      return response;
-    } catch (err) {
-      console.error("Error retrieving data:", err);
-      throw new Error("Failed to fetch Notion data.");
-    }
-  }
+
   async function getBlockChildren(blockId: string) {
     try {
       const response = await notion.blocks.children.list({ block_id: blockId });
@@ -45,27 +37,46 @@ export default async function Main() {
       throw new Error("Failed to fetch Notion data.");
     }
   }
-  const data = await getNotionData();
-  const block = await getBlock(data[0].id)
-  const blockChildren = await getBlockChildren(data[0].id)
-  
-  // console.log(blockChildren[0].paragraph.rich_text)
 
-  return data.map((elm) => {
-    const title = elm.properties["Name"].title[0].plain_text
-    const pageId = elm.id
-    const createdTime = elm.created_time
-    const createdUserId = elm.created_by.id
-  
+  const data = await getNotionData();
+  const scheme_text: string[] = [];
+
+  for (let item of data) {
+    try {
+      const blockChildren = await getBlockChildren(item.id);
+      let isThereParagraph = false;
+      for (let i = 0; i < blockChildren.length; i++) {
+        if (blockChildren[i].type === "paragraph") {
+          isThereParagraph = true;
+          const text = blockChildren[i].paragraph.rich_text[0].plain_text;
+          scheme_text.push(text);
+          break;
+        }
+      }
+      if (!isThereParagraph)
+        scheme_text.push(
+          "아직 노션에 작성된 글이 없어요. 인포팀 블로그 노션 페이지로 가서 글을 작성해주세요!!"
+        );
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  return data.map((elm, index) => {
+    const title = elm.properties["Name"].title[0].plain_text;
+    const pageId = elm.id;
+    const createdTime = elm.created_time;
+    const createdUserId = elm.created_by.id;
+
     return (
-      <Link key={pageId} href={`/writing/${pageId}`}>
-        <Writing
-          title={title}
-          content="인포팀에 있어서 가장 중요한 문제는 친해지는건데요 타코 문화가 그걸 해결해줄 수 있을거라고 생각했어요. 타코가 뭐냐면요 칭찬할 일이 있으면 상대에게 타코를 주는건데요, 타코를 많이 모으면 상품을 살 수 있어요. 타코를 통해서 인포팀원끼리 서로 친해지는 것을 기대했어요."
-          date={createdTime}
-          writer={createdUserId}
-        />
-      </Link>
+      <Writing
+        key={pageId}
+        title={title}
+        content={scheme_text[index]}
+        date={createdTime}
+        writer={createdUserId}
+        pageId={pageId}
+      />
     );
   });
 }

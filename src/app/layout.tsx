@@ -16,9 +16,10 @@ export default function RootLayout({
   return (
     <html>
       
-      <body className="flex flex-col items-center p-20">
+      <body className="flex flex-col items-center py-[100px]">
         <Navbar/>
-        <main>{children}</main>
+        <main className="w-[900px]">{children}</main>
+        
       </body>
     </html>
   );
