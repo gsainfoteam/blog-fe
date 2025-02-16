@@ -1,44 +1,42 @@
 import Writing from "../components/Writing/writing";
 import { Client } from "@notionhq/client";
 
-
 const notionKey = "secret_4xikJwE4vtTmD0zpD8vYtT6oTxuyygNRd9eLfdTO6nG";
 const notionDatabaseKey = "b066078bdd874b6099d7b0549cb4437d";
 const notion = new Client({ auth: notionKey });
-
-export default async function Main() {
-  async function getNotionData() {
-    try {
-      const response = await notion.databases.query({
-        database_id: notionDatabaseKey,
-      });
-      return response.results;
-    } catch (err) {
-      console.error("Error retrieving data:", err);
-      throw new Error("Failed to fetch Notion data.");
-    }
+async function getNotionData() {
+  try {
+    const response = await notion.databases.query({
+      database_id: notionDatabaseKey,
+    });
+    return response.results;
+  } catch (err) {
+    console.error("Error retrieving data:", err);
+    throw new Error("Failed to fetch Notion data.");
   }
-  // async function getUserName(userId: string) {
-  //   try {
-  //     const response = await notion.users.retrieve({ user_id: userId });
-  //     return response.name;
-  //   } catch (err) {
-  //     console.error("Error retrieving data:", err);
-  //     throw new Error("Failed to fetch Notion data.");
-  //   }
-  // }
-
-  async function getBlockChildren(blockId: string) {
-    try {
-      const response = await notion.blocks.children.list({ block_id: blockId });
-      return response.results;
-    } catch (err) {
-      console.error("Error retrieving data:", err);
-      throw new Error("Failed to fetch Notion data.");
-    }
+}
+async function getBlockChildren(blockId: string) {
+  try {
+    const response = await notion.blocks.children.list({ block_id: blockId });
+    return response.results;
+  } catch (err) {
+    console.error("Error retrieving data:", err);
+    throw new Error("Failed to fetch Notion data.");
   }
-
+}
+// async function getUserName(userId: string) {
+//   try {
+//     const response = await notion.users.retrieve({ user_id: userId });
+//     return response.name;
+//   } catch (err) {
+//     console.error("Error retrieving data:", err);
+//     throw new Error("Failed to fetch Notion data.");
+//   }
+// }
+export default async function Main({category}) {
+ 
   const data = await getNotionData();
+  console.log(data)
   const scheme_text: string[] = [];
   // const user: string[] = [];
   for (let item of data) {
