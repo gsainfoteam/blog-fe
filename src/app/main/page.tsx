@@ -24,21 +24,10 @@ async function getBlockChildren(blockId: string) {
     throw new Error("Failed to fetch Notion data.");
   }
 }
-// async function getUserName(userId: string) {
-//   try {
-//     const response = await notion.users.retrieve({ user_id: userId });
-//     return response.name;
-//   } catch (err) {
-//     console.error("Error retrieving data:", err);
-//     throw new Error("Failed to fetch Notion data.");
-//   }
-// }
 export default async function Main({category}) {
  
   const data = await getNotionData();
-  console.log(data)
   const scheme_text: string[] = [];
-  // const user: string[] = [];
   for (let item of data) {
     try {
       const blockChildren = await getBlockChildren(item.id);
@@ -59,16 +48,6 @@ export default async function Main({category}) {
       console.log(err);
     }
   }
-  // for (let itme of data) {
-  //   try {
-  //     const userId = itme.created_by.id;
-  //     const userName = await getUserName(userId);
-  //     if (userName) user.push(userName);
-  //     else user.push("Unknown User");
-  //   } catch (err) {
-  //     console.log(`Fail to find user:${err}`);
-  //   }
-  // }
   return data.map((elm, index) => {
     const title = elm.properties["Name"].title[0].plain_text;
     const pageId = elm.id;
