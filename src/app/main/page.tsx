@@ -24,7 +24,7 @@ async function getBlockChildren(blockId: string) {
     throw new Error("Failed to fetch Notion data.");
   }
 }
-export default async function Main({category}) {
+export default async function Main() {
  
   const data = await getNotionData();
   const scheme_text: string[] = [];
