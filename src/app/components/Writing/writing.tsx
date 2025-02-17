@@ -18,7 +18,7 @@ export default function Writing({
   return (
     <Link
       className="w-[739px] h-[163px] pt-[24px] pb-[24px] block my-1"
-      href={`writing/${pageId}`}
+      href={`writing/${pageId}/${title}`}
     >
       <div className="flex gap-[36px] justify-between">
         <div className="flex flex-col justify-between">

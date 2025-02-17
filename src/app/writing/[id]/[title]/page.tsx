@@ -25,6 +25,8 @@ n2m.setCustomTransformer("embed", async (block) => {
 
 export default async function DetailPage(props) {
   const pageId = props.params.id;
+  const pageTitleIncode = props.params.title
+  const pageTitle = decodeURIComponent(pageTitleIncode)
   const mdblocks = await n2m.pageToMarkdown(pageId);
   const mdString = n2m.toMarkdownString(mdblocks);
   const markdown = mdString.parent;
@@ -37,6 +39,7 @@ export default async function DetailPage(props) {
   const htmlString = html.toString();
   return (
     <div className="flex flex-col items-center">
+      <h1>{pageTitle}</h1>
       <div dangerouslySetInnerHTML={{ __html: htmlString }} />
       <div className="flex flex-col items-end w-[900px] my-[50px]">
         <ShareButton url={`https://www.notion.so/infoteam-rulrudino/${pageId}`} />
