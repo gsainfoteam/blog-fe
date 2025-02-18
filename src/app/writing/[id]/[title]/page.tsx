@@ -25,12 +25,14 @@ n2m.setCustomTransformer("embed", async (block) => {
 
 export default async function DetailPage(props) {
   const pageId = props.params.id;
-  const pageTitleIncode = props.params.title
-  const pageTitle = decodeURIComponent(pageTitleIncode)
+  const pageTitleIncode = props.params.title;
+  const pageTitle = decodeURIComponent(pageTitleIncode);
   const mdblocks = await n2m.pageToMarkdown(pageId);
   const mdString = n2m.toMarkdownString(mdblocks);
   const markdown = mdString.parent;
+  const urlPageId = pageId.replace(/-/g, "");
 
+  console.log(urlPageId);
   const html = await unified()
     .use(parse)
     .use(toRehype)
@@ -42,10 +44,12 @@ export default async function DetailPage(props) {
       <h1>{pageTitle}</h1>
       <div dangerouslySetInnerHTML={{ __html: htmlString }} />
       <div className="flex flex-col items-end w-[900px] my-[50px]">
-        <ShareButton url={`https://www.notion.so/infoteam-rulrudino/${pageId}`} />
+        <ShareButton
+          url={`https://www.notion.so/infoteam-rulrudino/${urlPageId}`}
+        />
       </div>
       <h4>인포팀에서 함께 일하고 싶다면?</h4>
-      
+
       <Link
         href="/"
         className="text-sm px-[12px] py-[8px] rounded-[5px] border-2 border-[#FF4500] text-[#FF4500]"
