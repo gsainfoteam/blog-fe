@@ -1,8 +1,8 @@
 import Writing from "@/app/components/Writing/writing";
 import { Client } from "@notionhq/client";
 
-const notionKey = "secret_4xikJwE4vtTmD0zpD8vYtT6oTxuyygNRd9eLfdTO6nG";
-const notionDatabaseKey = "b066078bdd874b6099d7b0549cb4437d";
+const notionKey = process.env.NOTION_SECRET_KEY;
+const notionDatabaseKey = process.env.NOTION_DATABASE_KEY;
 const notion = new Client({ auth: notionKey });
 
 async function getNotionData(category) {
@@ -36,22 +36,30 @@ export default async function CategorizedPage({ params }) {
   const category = decodeURIComponent(params.category);
   const data = await getNotionData(category);
   const scheme_text: string[] = [];
+  const preview_image: string[] = [];
   for (let item of data) {
     try {
       const blockChildren = await getBlockChildren(item.id);
       let isThereParagraph = false;
+      let isTherePictrue = false;
       for (let i = 0; i < blockChildren.length; i++) {
-        if (blockChildren[i].type === "paragraph") {
+        if (blockChildren[i].type === "paragraph" && !isThereParagraph) {
           isThereParagraph = true;
           const text = blockChildren[i].paragraph.rich_text[0].plain_text;
           scheme_text.push(text);
-          break;
         }
+        if (blockChildren[i].type === "image" && !isTherePictrue) {
+          isTherePictrue = true;
+          const pictureUrl = blockChildren[i].image.file.url;
+          preview_image.push(pictureUrl);
+        }
+        if (isThereParagraph && isTherePictrue) break;
       }
       if (!isThereParagraph)
         scheme_text.push(
           "아직 노션에 작성된 글이 없어요. 인포팀 블로그 노션 페이지로 가서 글을 작성해주세요!!"
         );
+      if (!isTherePictrue) preview_image.push("No PreviewImage");
     } catch (err) {
       console.log(err);
     }
@@ -70,6 +78,7 @@ export default async function CategorizedPage({ params }) {
         date={createdTimeSliced}
         writer={createdUserId}
         pageId={pageId}
+        imageUrl={preview_image[index]}
       />
     );
   });

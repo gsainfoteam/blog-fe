@@ -1,4 +1,3 @@
-import Writing from "./components/Writing/writing";
 import Link from "next/link";
 export default function Content() {
   return (
