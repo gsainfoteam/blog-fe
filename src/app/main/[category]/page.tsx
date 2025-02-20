@@ -1,8 +1,8 @@
 import Writing from "@/app/components/Writing/writing";
 import { Client } from "@notionhq/client";
 
-const notionKey = "secret_4xikJwE4vtTmD0zpD8vYtT6oTxuyygNRd9eLfdTO6nG";
-const notionDatabaseKey = "b066078bdd874b6099d7b0549cb4437d";
+const notionKey = process.env.NOTION_SECRET_KEY;
+const notionDatabaseKey = process.env.NOTION_DATABASE_KEY;
 const notion = new Client({ auth: notionKey });
 
 async function getNotionData(category) {
@@ -64,7 +64,6 @@ export default async function CategorizedPage({ params }) {
       console.log(err);
     }
   }
-  console.log(preview_image)
   return data.map((elm, index) => {
     const title = elm.properties["Name"].title[0].plain_text;
     const pageId = elm.id;

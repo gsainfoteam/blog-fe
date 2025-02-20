@@ -8,7 +8,7 @@ import toRehype from "remark-rehype";
 
 import Link from "next/link";
 import ShareButton from "@/app/components/ShareButton/ShareButton";
-const notionKey = process.env.NOTION_KEY;
+const notionKey = process.env.NOTION_SECRET_KEY;
 const notion = new Client({ auth: notionKey });
 const n2m = new NotionToMarkdown({
   notionClient: notion,
