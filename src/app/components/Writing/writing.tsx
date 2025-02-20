@@ -33,7 +33,13 @@ export default function Writing({
             {date} {writer}{" "}
           </p>
         </div>
-        <Image src={DefaultImage} width={130} height={90} alt="Content Image" />
+        <Image
+          src={imageUrl === "No PreviewImage" ? DefaultImage : imageUrl}
+          width={130}
+          height={90}
+          alt="Content Image"
+          className="rounded-lg object-cover aspect-[130/90]"
+        />{" "}
       </div>
     </Link>
   );
