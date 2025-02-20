@@ -7,6 +7,7 @@ type WritingProps = {
   date: string;
   writer: string;
   pageId: string;
+  imageUrl: string;
 };
 export default function Writing({
   title,
@@ -14,6 +15,7 @@ export default function Writing({
   date,
   writer,
   pageId,
+  imageUrl,
 }: WritingProps) {
   return (
     <Link
