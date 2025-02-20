@@ -19,27 +19,26 @@ export default function Writing({
 }: WritingProps) {
   return (
     <Link
-      className="w-[739px] h-[163px] pt-[24px] pb-[24px] block my-1"
+      className="w-[800px] h-[180px] pt-[24px] pb-[24px] block my-1"
       href={`writing/${pageId}/${title}`}
     >
       <div className="flex gap-[36px] justify-between">
-        <div className="flex flex-col justify-between">
-          <div>
-            <strong>{title}</strong>
-            <p>{content}</p>
-          </div>
+        <div className="flex flex-col w-[600px] justify-between">
+          <strong>{title}</strong>
+          <p>{content}</p>
           <p>
-            {" "}
-            {date} {writer}{" "}
+            {date} {writer}
           </p>
         </div>
-        <Image
-          src={imageUrl === "No PreviewImage" ? DefaultImage : imageUrl}
-          width={130}
-          height={90}
-          alt="Content Image"
-          className="rounded-lg object-cover aspect-[130/90]"
-        />{" "}
+        <div className="relative w-[130px] h-[90px]">
+          <Image
+            src={imageUrl === "No PreviewImage" ? DefaultImage : imageUrl}
+            alt="Content Image"
+            className="rounded-lg"
+            layout="fill"
+            objectFit="cover"
+          />
+        </div>
       </div>
     </Link>
   );
