@@ -29,6 +29,7 @@ async function getUser(userId: string) {
     const response = await notion.users.retrieve({ user_id: userId });
     return response.name;
   } catch (err) {
+    return null
     console.error("Error retrieving data:", err);
   }
 }
