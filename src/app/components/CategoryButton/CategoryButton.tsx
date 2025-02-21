@@ -16,7 +16,7 @@ export default function CategroyButton({
 
   
   return (
-    <Link href={elm==="전체"?`/main`:`/main/${elm}`}>
+    <Link href={`/main/${elm}`}>
     <button
       className={`w-[61px] h-[43px] p-[12px] rounded-[24px] text-sm ${
         filter[index] ? "bg-[#FF4500] text-white" : "bg-[#E8E8E8] text-gray-600"

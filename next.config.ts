@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/",
-        destination: "/main",
+        destination: "/main/전체",
         permanent: true, 
       },
     ];

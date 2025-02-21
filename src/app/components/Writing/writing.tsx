@@ -20,7 +20,7 @@ export default function Writing({
   return (
     <Link
       className="w-[800px] h-[180px] pt-[24px] pb-[24px] block my-1"
-      href={`writing/${pageId}/${title}`}
+      href={`/writing/${pageId}/${title}`}
     >
       <div className="flex gap-[36px] justify-between">
         <div className="flex flex-col w-[600px] justify-between">
