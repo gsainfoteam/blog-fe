@@ -31,12 +31,22 @@ async function getBlockChildren(blockId: string) {
     throw new Error("Failed to fetch Notion data.");
   }
 }
+async function getUser(userId: string) {
+  try {
+    const response = await notion.users.retrieve({ user_id: userId });
+    return response.name;
+  } catch (err) {
+    console.error("Error retrieving data:", err);
+  }
+}
 
 export default async function CategorizedPage({ params }) {
   const category = decodeURIComponent(params.category);
   const data = await getNotionData(category);
   const scheme_text: string[] = [];
   const preview_image: string[] = [];
+  const user_names: string[] = [];
+
   for (let item of data) {
     try {
       const blockChildren = await getBlockChildren(item.id);
@@ -64,11 +74,18 @@ export default async function CategorizedPage({ params }) {
       console.log(err);
     }
   }
+  for (const item of data) {
+    const userId = item.created_by.id;
+    let userName = null;
+    userName = await getUser(userId);
+    if (userName) user_names.push(userName);
+    else user_names.push("Unknown User");
+  }
   return data.map((elm, index) => {
     const title = elm.properties["Name"].title[0].plain_text;
     const pageId = elm.id;
     const createdTime = elm.created_time;
-    const createdUserId = elm.created_by.id;
+    const createdUserId = user_names[index];
     const createdTimeSliced = createdTime.slice(0, 10);
     return (
       <Writing
