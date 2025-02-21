@@ -32,7 +32,6 @@ export default async function DetailPage(props) {
   const markdown = mdString.parent;
   const urlPageId = pageId.replace(/-/g, "");
 
-  console.log(urlPageId);
   const html = await unified()
     .use(parse)
     .use(toRehype)
