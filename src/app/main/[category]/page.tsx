@@ -1,21 +1,23 @@
 import Writing from "@/app/components/Writing/writing";
 import { Client } from "@notionhq/client";
-
 const notionKey = process.env.NOTION_SECRET_KEY;
 const notionDatabaseKey = process.env.NOTION_DATABASE_KEY;
 const notion = new Client({ auth: notionKey });
 
 async function getNotionData(category) {
   try {
-    const response = await notion.databases.query({
+    const query = {
       database_id: notionDatabaseKey,
-      filter: {
+    };
+    if (category !== "전체") {
+      query.filter = {
         property: "카테고리",
         select: {
           equals: category,
         },
-      },
-    });
+      };
+    }
+    const response = await notion.databases.query(query);
     return response.results;
   } catch (err) {
     console.error("Error retrieving data:", err);

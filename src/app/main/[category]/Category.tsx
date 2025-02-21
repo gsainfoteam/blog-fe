@@ -1,11 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import CategroyButton from "../components/CategoryButton/CategoryButton";
+import CategroyButton from "../../components/CategoryButton/CategoryButton";
 
-export default function Category() {
-  const [filter, setFilter] = useState<boolean[]>([true, false, false]);
+export default function Category({
+  currentCategory,
+}: {
+  currentCategory: string;
+}) {
   const category = ["전체", "기술", "문화"];
+  const currentFilter: boolean[] = [];
+  for (const elm of category) {
+    if (elm === currentCategory) currentFilter.push(true);
+    else currentFilter.push(false);
+  }
+  const [filter, setFilter] = useState<boolean[]>(currentFilter);
+
   const handleClick = (idx: number) => {
     const newArr = Array(category.length).fill(false);
     newArr[idx] = true;
