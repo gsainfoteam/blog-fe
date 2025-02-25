@@ -13,7 +13,7 @@ RUN corepack enable
 COPY .yarn ./.yarn
 
 # Install dependencies based on the preferred package manager (NEW copy yarnrc.yml to the image)
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .yarnrc.yml ./
+COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
 
 
 RUN \
