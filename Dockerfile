@@ -10,7 +10,6 @@ WORKDIR /app
 
 # NEW enable yarn 4.0.2 version and copy yarnrc.yml
 RUN corepack enable
-COPY .yarn ./.yarn
 
 # Install dependencies based on the preferred package manager (NEW copy yarnrc.yml to the image)
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
