@@ -1,0 +1,14 @@
+Dockerfile
+.dockerignore
+npm-debug.log
+README.md
+.next
+.git
+node_modules
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
