@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { FaLink } from "react-icons/fa";
 
-export default function ShareButton({ url }) {
+export default function ShareButton({ url }: { url: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopyLink = () => {
