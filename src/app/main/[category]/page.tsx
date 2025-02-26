@@ -1,10 +1,12 @@
 import Writing from "@/app/components/Writing/writing";
 import { Client } from "@notionhq/client";
+import { QueryDatabaseResponse } from "@notionhq/client/build/src/api-endpoints";
+
 const notionKey = process.env.NOTION_SECRET_KEY;
 const notionDatabaseKey = process.env.NOTION_DATABASE_KEY;
 const notion = new Client({ auth: notionKey });
 
-async function getNotionData(category) {
+async function getNotionData(category: string): Promise<QueryDatabaseResponse> {
   try {
     const query = {
       database_id: notionDatabaseKey,
@@ -18,7 +20,7 @@ async function getNotionData(category) {
       };
     }
     const response = await notion.databases.query(query);
-    return response.results;
+    return response;
   } catch (err) {
     console.error("Error retrieving data:", err);
     throw new Error("Failed to fetch Notion data.");
@@ -42,14 +44,22 @@ async function getUser(userId: string) {
   }
 }
 
-export default async function CategorizedPage({ params }) {
-  const category = decodeURIComponent(params.category);
-  const data = await getNotionData(category);
+interface CategorizedPageProps {
+  params: Promise<{ category: string }>;
+}
+
+export default async function CategorizedPage({
+  params,
+}: CategorizedPageProps) {
+  let { category } = await params;
+  category = decodeURIComponent(category);
+  const response = await getNotionData(category);
+  const data = response.results;
   const scheme_text: string[] = [];
   const preview_image: string[] = [];
   const user_names: string[] = [];
 
-  for (let item of data) {
+  for (const item of data) {
     try {
       const blockChildren = await getBlockChildren(item.id);
       let isThereParagraph = false;
