@@ -1,13 +1,22 @@
 import Writing from "@/app/components/Writing/writing";
 import { Client } from "@notionhq/client";
-import { QueryDatabaseResponse } from "@notionhq/client/build/src/api-endpoints";
+import {
+  BlockObjectResponse,
+  QueryDatabaseResponse,
+} from "@notionhq/client/build/src/api-endpoints";
 import { QueryDatabaseParameters } from "@notionhq/client/build/src/api-endpoints";
 import { ListBlockChildrenResponseResults } from "notion-to-md/build/types";
-
+import { PartialBlockObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 const notionKey: string = process.env.NOTION_SECRET_KEY || "NOTION_SECRET_KEY";
 const notionDatabaseKey =
   process.env.NOTION_DATABASE_KEY || "NOTION_DATABASE_KEY";
 const notion = new Client({ auth: notionKey });
+
+function isBlockObjectResponse(
+  block: PartialBlockObjectResponse | BlockObjectResponse
+): block is BlockObjectResponse {
+  return (block as BlockObjectResponse).type !== undefined;
+}
 
 async function getNotionData(category: string): Promise<QueryDatabaseResponse> {
   try {
