@@ -23,9 +23,12 @@ n2m.setCustomTransformer("embed", async (block) => {
 </figure>`;
 });
 
-export default async function DetailPage(props) {
-  const pageId = props.params.id;
-  const pageTitleIncode = props.params.title;
+
+interface DetailPageProps {
+  params: Promise<{ id: string, title: string }>;
+}
+export default async function DetailPage({params}:DetailPageProps) {
+  const {id: pageId, title: pageTitleIncode} = await params
   const pageTitle = decodeURIComponent(pageTitleIncode);
   const mdblocks = await n2m.pageToMarkdown(pageId);
   const mdString = n2m.toMarkdownString(mdblocks);
