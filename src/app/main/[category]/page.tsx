@@ -6,17 +6,11 @@ import {
 } from "@notionhq/client/build/src/api-endpoints";
 import { QueryDatabaseParameters } from "@notionhq/client/build/src/api-endpoints";
 import { ListBlockChildrenResponseResults } from "notion-to-md/build/types";
-import { PartialBlockObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+
 const notionKey: string = process.env.NOTION_SECRET_KEY || "NOTION_SECRET_KEY";
 const notionDatabaseKey =
   process.env.NOTION_DATABASE_KEY || "NOTION_DATABASE_KEY";
 const notion = new Client({ auth: notionKey });
-
-function isBlockObjectResponse(
-  block: PartialBlockObjectResponse | BlockObjectResponse
-): block is BlockObjectResponse {
-  return (block as BlockObjectResponse).type !== undefined;
-}
 
 async function getNotionData(category: string): Promise<QueryDatabaseResponse> {
   try {
@@ -84,18 +78,28 @@ export default async function CategorizedPage({
       const blockChildren = await getBlockChildren(item.id);
       let isThereParagraph = false;
       let isTherePictrue = false;
+
       for (let i = 0; i < blockChildren.length; i++) {
-        if (blockChildren[i].type === "paragraph" && !isThereParagraph) {
-          isThereParagraph = true;
-          const text = blockChildren[i].paragraph.rich_text[0].plain_text;
-          scheme_text.push(text);
+        const block = blockChildren[i];
+        if ((block as BlockObjectResponse).type === undefined) break;
+        if ("type" in block) {
+          if (block.type === "paragraph" && !isThereParagraph) {
+            isThereParagraph = true;
+            const text = block.paragraph.rich_text[0].plain_text;
+            scheme_text.push(text);
+          }
+          if (block.type === "image" && !isTherePictrue) {
+            isTherePictrue = true;
+            let pictureUrl;
+            if (block.image.type === "external")
+              pictureUrl = block.image.external.url;
+            else if (block.image.type === "file")
+              pictureUrl = block.image.file.url;
+            else pictureUrl = "No PreviewImage";
+            preview_image.push(pictureUrl);
+          }
+          if (isThereParagraph && isTherePictrue) break;
         }
-        if (blockChildren[i].type === "image" && !isTherePictrue) {
-          isTherePictrue = true;
-          const pictureUrl = blockChildren[i].image.file.url;
-          preview_image.push(pictureUrl);
-        }
-        if (isThereParagraph && isTherePictrue) break;
       }
       if (!isThereParagraph)
         scheme_text.push(
