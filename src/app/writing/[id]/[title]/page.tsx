@@ -8,6 +8,7 @@ import toRehype from "remark-rehype";
 
 import Link from "next/link";
 import ShareButton from "@/app/components/ShareButton/ShareButton";
+import { EmbedBlockObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 const notionKey = process.env.NOTION_SECRET_KEY;
 const notion = new Client({ auth: notionKey });
 const n2m = new NotionToMarkdown({
@@ -15,17 +16,18 @@ const n2m = new NotionToMarkdown({
 });
 
 n2m.setCustomTransformer("embed", async (block) => {
-  const { embed } = block as any;
+  const { embed } = block as EmbedBlockObjectResponse;
   if (!embed?.url) return "";
   return `<figure style="margin: 20px;">
   <iframe src="${embed?.url}"></iframe>
-  <figcaption>${await n2m.blockToMarkdown(embed?.caption)}</figcaption>
 </figure>`;
 });
 
-export default async function DetailPage(props) {
-  const pageId = props.params.id;
-  const pageTitleIncode = props.params.title;
+interface DetailPageProps {
+  params: Promise<{ id: string; title: string }>;
+}
+export default async function DetailPage({ params }: DetailPageProps) {
+  const { id: pageId, title: pageTitleIncode } = await params;
   const pageTitle = decodeURIComponent(pageTitleIncode);
   const mdblocks = await n2m.pageToMarkdown(pageId);
   const mdString = n2m.toMarkdownString(mdblocks);

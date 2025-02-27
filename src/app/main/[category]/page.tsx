@@ -1,30 +1,55 @@
 import Writing from "@/app/components/Writing/writing";
 import { Client } from "@notionhq/client";
-const notionKey = process.env.NOTION_SECRET_KEY;
-const notionDatabaseKey = process.env.NOTION_DATABASE_KEY;
+import {
+  BlockObjectResponse,
+  EmptyObject,
+  GetUserResponse,
+  QueryDatabaseResponse,
+  RichTextItemResponse,
+} from "@notionhq/client/build/src/api-endpoints";
+import { QueryDatabaseParameters } from "@notionhq/client/build/src/api-endpoints";
+import { ListBlockChildrenResponseResults } from "notion-to-md/build/types";
+
+const notionKey: string = process.env.NOTION_SECRET_KEY || "NOTION_SECRET_KEY";
+const notionDatabaseKey =
+  process.env.NOTION_DATABASE_KEY || "NOTION_DATABASE_KEY";
 const notion = new Client({ auth: notionKey });
 
-async function getNotionData(category) {
+function isRichTextItemResponse(
+  item: RichTextItemResponse[] | EmptyObject
+): item is RichTextItemResponse[] {
+  return (item as RichTextItemResponse[])[0].type === "text";
+}
+
+async function getNotionData(category: string): Promise<QueryDatabaseResponse> {
   try {
-    const query = {
-      database_id: notionDatabaseKey,
-    };
+    let query: QueryDatabaseParameters;
     if (category !== "전체") {
-      query.filter = {
-        property: "카테고리",
-        select: {
-          equals: category,
+      query = {
+        database_id: notionDatabaseKey,
+        filter: {
+          property: "카테고리",
+          select: {
+            equals: category,
+          },
         },
       };
+    } else {
+      query = {
+        database_id: notionDatabaseKey,
+      };
     }
+
     const response = await notion.databases.query(query);
-    return response.results;
+    return response;
   } catch (err) {
     console.error("Error retrieving data:", err);
     throw new Error("Failed to fetch Notion data.");
   }
 }
-async function getBlockChildren(blockId: string) {
+async function getBlockChildren(
+  blockId: string
+): Promise<ListBlockChildrenResponseResults> {
   try {
     const response = await notion.blocks.children.list({ block_id: blockId });
     return response.results;
@@ -33,39 +58,58 @@ async function getBlockChildren(blockId: string) {
     throw new Error("Failed to fetch Notion data.");
   }
 }
-async function getUser(userId: string) {
+async function getUser(userId: string): Promise<GetUserResponse> {
   try {
     const response = await notion.users.retrieve({ user_id: userId });
-    return response.name;
+    return response;
   } catch (err) {
     console.error("Error retrieving data:", err);
+    throw new Error("Fail to load user");
   }
 }
 
-export default async function CategorizedPage({ params }) {
-  const category = decodeURIComponent(params.category);
-  const data = await getNotionData(category);
+interface CategorizedPageProps {
+  params: Promise<{ category: string }>;
+}
+
+export default async function CategorizedPage({
+  params,
+}: CategorizedPageProps) {
+  let { category } = await params;
+  category = decodeURIComponent(category);
+  const response = await getNotionData(category);
+  const data = response.results;
   const scheme_text: string[] = [];
   const preview_image: string[] = [];
   const user_names: string[] = [];
 
-  for (let item of data) {
+  for (const item of data) {
     try {
       const blockChildren = await getBlockChildren(item.id);
       let isThereParagraph = false;
       let isTherePictrue = false;
+
       for (let i = 0; i < blockChildren.length; i++) {
-        if (blockChildren[i].type === "paragraph" && !isThereParagraph) {
-          isThereParagraph = true;
-          const text = blockChildren[i].paragraph.rich_text[0].plain_text;
-          scheme_text.push(text);
+        const block = blockChildren[i];
+        if ((block as BlockObjectResponse).type === undefined) break;
+        if ("type" in block) {
+          if (block.type === "paragraph" && !isThereParagraph) {
+            isThereParagraph = true;
+            const text = block.paragraph.rich_text[0].plain_text;
+            scheme_text.push(text);
+          }
+          if (block.type === "image" && !isTherePictrue) {
+            isTherePictrue = true;
+            let pictureUrl;
+            if (block.image.type === "external")
+              pictureUrl = block.image.external.url;
+            else if (block.image.type === "file")
+              pictureUrl = block.image.file.url;
+            else pictureUrl = "No PreviewImage";
+            preview_image.push(pictureUrl);
+          }
+          if (isThereParagraph && isTherePictrue) break;
         }
-        if (blockChildren[i].type === "image" && !isTherePictrue) {
-          isTherePictrue = true;
-          const pictureUrl = blockChildren[i].image.file.url;
-          preview_image.push(pictureUrl);
-        }
-        if (isThereParagraph && isTherePictrue) break;
       }
       if (!isThereParagraph)
         scheme_text.push(
@@ -77,16 +121,33 @@ export default async function CategorizedPage({ params }) {
     }
   }
   for (const item of data) {
-    const userId = item.created_by.id;
-    let userName = null;
-    userName = await getUser(userId);
-    if (userName) user_names.push(userName);
-    else user_names.push("Unknown User");
+    if ("created_by" in item) {
+      const userId = item.created_by.id;
+      const userInfo = await getUser(userId);
+      if (userInfo.name) user_names.push(userInfo.name);
+      else user_names.push("Unknown User");
+    } else user_names.push("Unknown User");
   }
+
   return data.map((elm, index) => {
-    const title = elm.properties["Name"].title[0].plain_text;
+    let title;
+    let createdTime;
+    if ("properties" in elm && elm.properties["Name"].type === "title") {
+      const RichTextitme = elm.properties["Name"].title;
+      if (isRichTextItemResponse(RichTextitme)) {
+        title = RichTextitme[0].plain_text;
+      } else {
+        title = "Unknwon title";
+      }
+    } else {
+      title = "Unknown title";
+    }
+    if ("created_time" in elm) {
+      createdTime = elm.created_time;
+    } else {
+      createdTime = "2005-01-18";
+    }
     const pageId = elm.id;
-    const createdTime = elm.created_time;
     const createdUserId = user_names[index];
     const createdTimeSliced = createdTime.slice(0, 10);
     return (

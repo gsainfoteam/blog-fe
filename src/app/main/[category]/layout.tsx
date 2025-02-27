@@ -5,13 +5,12 @@ import React from "react";
 
 interface MainLayoutProps {
   children: React.ReactNode;
-  params: {
-    category: string;
-  };
+  params: Promise<{ category: string }>;
 }
 
-export default function MainLayout({ children, params }: MainLayoutProps) {
-  const currentCategory = decodeURIComponent(params.category);
+export default async function MainLayout({ children, params }: MainLayoutProps) {
+  const {category} = await params
+  const currentCategory = decodeURIComponent(category);
   return (
     <>
       <Image src={Banner} alt="Content Image" width={900} />
