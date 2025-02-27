@@ -2,8 +2,10 @@ import Writing from "@/app/components/Writing/writing";
 import { Client } from "@notionhq/client";
 import {
   BlockObjectResponse,
+  EmptyObject,
   GetUserResponse,
   QueryDatabaseResponse,
+  RichTextItemResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import { QueryDatabaseParameters } from "@notionhq/client/build/src/api-endpoints";
 import { ListBlockChildrenResponseResults } from "notion-to-md/build/types";
@@ -12,6 +14,12 @@ const notionKey: string = process.env.NOTION_SECRET_KEY || "NOTION_SECRET_KEY";
 const notionDatabaseKey =
   process.env.NOTION_DATABASE_KEY || "NOTION_DATABASE_KEY";
 const notion = new Client({ auth: notionKey });
+
+function isRichTextItemResponse(
+  item: RichTextItemResponse[] | EmptyObject
+): item is RichTextItemResponse[] {
+  return (item as RichTextItemResponse[])[0].type === "text";
+}
 
 async function getNotionData(category: string): Promise<QueryDatabaseResponse> {
   try {
@@ -50,13 +58,13 @@ async function getBlockChildren(
     throw new Error("Failed to fetch Notion data.");
   }
 }
-async function getUser(userId: string):Promise<GetUserResponse> {
+async function getUser(userId: string): Promise<GetUserResponse> {
   try {
     const response = await notion.users.retrieve({ user_id: userId });
     return response;
   } catch (err) {
     console.error("Error retrieving data:", err);
-    throw new Error("Fail to load user")
+    throw new Error("Fail to load user");
   }
 }
 
@@ -113,15 +121,33 @@ export default async function CategorizedPage({
     }
   }
   for (const item of data) {
-    const userId = item.created_by.id;
-    const userInfo = await getUser(userId);
-    if (userInfo.name) user_names.push(userInfo.name);
-    else user_names.push("Unknown User");
+    if ("created_by" in item) {
+      const userId = item.created_by.id;
+      const userInfo = await getUser(userId);
+      if (userInfo.name) user_names.push(userInfo.name);
+      else user_names.push("Unknown User");
+    } else user_names.push("Unknown User");
   }
+
   return data.map((elm, index) => {
-    const title = elm.properties["Name"].title[0].plain_text;
+    let title;
+    let createdTime;
+    if ("properties" in elm && elm.properties["Name"].type === "title") {
+      const RichTextitme = elm.properties["Name"].title;
+      if (isRichTextItemResponse(RichTextitme)) {
+        title = RichTextitme[0].plain_text;
+      } else {
+        title = "Unknwon title";
+      }
+    } else {
+      title = "Unknown title";
+    }
+    if ("created_time" in elm) {
+      createdTime = elm.created_time;
+    } else {
+      createdTime = "2005-01-18";
+    }
     const pageId = elm.id;
-    const createdTime = elm.created_time;
     const createdUserId = user_names[index];
     const createdTimeSliced = createdTime.slice(0, 10);
     return (
