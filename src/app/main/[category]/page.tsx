@@ -2,7 +2,6 @@ import Writing from "@/app/components/Writing/writing";
 import { Client } from "@notionhq/client";
 import {
   BlockObjectResponse,
-  EmptyObject,
   GetUserResponse,
   QueryDatabaseResponse,
   RichTextItemResponse,
@@ -16,7 +15,7 @@ const notionDatabaseKey =
 const notion = new Client({ auth: notionKey });
 
 function isRichTextItemResponse(
-  item: RichTextItemResponse[] | EmptyObject
+  item: RichTextItemResponse[] |  Record<string, never>
 ): item is RichTextItemResponse[] {
   return (item as RichTextItemResponse[])[0].type === "text";
 }
