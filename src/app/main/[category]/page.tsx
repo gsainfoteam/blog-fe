@@ -2,6 +2,7 @@ import Writing from "@/app/components/Writing/writing";
 import { Client } from "@notionhq/client";
 import {
   BlockObjectResponse,
+  GetUserResponse,
   QueryDatabaseResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import { QueryDatabaseParameters } from "@notionhq/client/build/src/api-endpoints";
@@ -49,12 +50,13 @@ async function getBlockChildren(
     throw new Error("Failed to fetch Notion data.");
   }
 }
-async function getUser(userId: string) {
+async function getUser(userId: string):Promise<GetUserResponse> {
   try {
     const response = await notion.users.retrieve({ user_id: userId });
-    return response.name;
+    return response;
   } catch (err) {
     console.error("Error retrieving data:", err);
+    throw new Error("Fail to load user")
   }
 }
 
@@ -112,9 +114,8 @@ export default async function CategorizedPage({
   }
   for (const item of data) {
     const userId = item.created_by.id;
-    let userName = null;
-    userName = await getUser(userId);
-    if (userName) user_names.push(userName);
+    const userInfo = await getUser(userId);
+    if (userInfo.name) user_names.push(userInfo.name);
     else user_names.push("Unknown User");
   }
   return data.map((elm, index) => {
