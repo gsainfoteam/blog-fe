@@ -67,3 +67,7 @@ li {
   margin-bottom: 8px; /* 항목 간 간격 */
   font-size: 1rem; /* 목록 항목 기본 글꼴 크기 */
 }
+
+.font-gwangwon {
+  font-family: var(--font-gwangwon);
+}

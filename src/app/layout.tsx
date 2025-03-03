@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "./components/Nav/navbar";
+import localFont from 'next/font/local';
+
+const gwangwon = localFont({
+  src: './fonts/GwangwonEduPower.woff',
+  variable: '--font-gwangwon',
+});
+
 
 export const metadata: Metadata = {
   title: "INFOTEAM BLOG",
@@ -13,10 +20,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html>
+    <html className={gwangwon.variable}>
       
       <body className="flex flex-col items-center py-[100px]">
         <Navbar/>
+        <div style={{ height: "72px" }}></div>
         <main className="w-[900px]">{children}</main>
         
       </body>
