@@ -11,6 +11,11 @@ const nextConfig: NextConfig = {
         destination: "/main/전체",
         permanent: true,
       },
+      {
+        source: "/main",
+        destination: "/main/전체",
+        permanent: true,
+      }  
     ];
   },
   output: "standalone",
