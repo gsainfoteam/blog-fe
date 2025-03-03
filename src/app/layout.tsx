@@ -24,7 +24,7 @@ export default function RootLayout({
       
       <body className="flex flex-col items-center py-[100px]">
         <Navbar/>
-        <div style={{ height: "72px" }}></div>"
+        <div style={{ height: "72px" }}></div>
         <main className="w-[900px]">{children}</main>
         
       </body>
