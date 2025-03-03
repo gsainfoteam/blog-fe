@@ -43,6 +43,7 @@ export default async function DetailPage({ params }: DetailPageProps) {
   return (
     <div className="flex flex-col items-center">
       <h1>{pageTitle}</h1>
+      <div style={{ height: "160px" }}></div>
       <div dangerouslySetInnerHTML={{ __html: htmlString }} />
       <div className="flex flex-col items-end w-[900px] my-[50px]">
         <ShareButton

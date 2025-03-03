@@ -14,11 +14,10 @@ export default async function MainLayout({ children, params }: MainLayoutProps) 
   return (
     <>
       <Image src={Banner} alt="Content Image" width={900} />
-
+      <div style={{ height: "80px" }}></div>
       <div className="my-[20px]">
         <Category currentCategory={currentCategory} />
       </div>
-
       <div className="flex-col">{children}</div>
     </>
   );
