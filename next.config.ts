@@ -9,10 +9,11 @@ const nextConfig: NextConfig = {
       {
         source: "/",
         destination: "/main/전체",
-        permanent: true, 
+        permanent: true,
       },
     ];
   },
+  output: "standalone",
 };
 
 export default nextConfig;
