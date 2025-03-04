@@ -157,41 +157,43 @@ export default async function CategorizedPage({
   }
 
   return (
-    <div>
-      <TagGroup tags={tags} category={category}/>
-      {data.map((elm, index) => {
-        let title;
-        let createdTime;
-        if ("properties" in elm && elm.properties["Name"].type === "title") {
-          const RichTextitme = elm.properties["Name"].title;
-          if (isRichTextItemResponse(RichTextitme)) {
-            title = RichTextitme[0].plain_text;
+    <div className="flex items-start justify-between">
+      <div className="flex flex-col">
+        {data.map((elm, index) => {
+          let title;
+          let createdTime;
+          if ("properties" in elm && elm.properties["Name"].type === "title") {
+            const RichTextitme = elm.properties["Name"].title;
+            if (isRichTextItemResponse(RichTextitme)) {
+              title = RichTextitme[0].plain_text;
+            } else {
+              title = "Unknwon title";
+            }
           } else {
-            title = "Unknwon title";
+            title = "Unknown title";
           }
-        } else {
-          title = "Unknown title";
-        }
-        if ("created_time" in elm) {
-          createdTime = elm.created_time;
-        } else {
-          createdTime = "2005-01-18";
-        }
-        const pageId = elm.id;
-        const createdUserId = user_names[index];
-        const createdTimeSliced = createdTime.slice(0, 10);
-        return (
-          <Writing
-            key={pageId}
-            title={title}
-            content={scheme_text[index]}
-            date={createdTimeSliced}
-            writer={createdUserId}
-            pageId={pageId}
-            imageUrl={preview_image[index]}
-          />
-        );
-      })}
+          if ("created_time" in elm) {
+            createdTime = elm.created_time;
+          } else {
+            createdTime = "2005-01-18";
+          }
+          const pageId = elm.id;
+          const createdUserId = user_names[index];
+          const createdTimeSliced = createdTime.slice(0, 10);
+          return (
+            <Writing
+              key={pageId}
+              title={title}
+              content={scheme_text[index]}
+              date={createdTimeSliced}
+              writer={createdUserId}
+              pageId={pageId}
+              imageUrl={preview_image[index]}
+            />
+          );
+        })}
+      </div>
+      <TagGroup tags={tags} category={category} />
     </div>
   );
 }

@@ -19,7 +19,7 @@ export default function Writing({
 }: WritingProps) {
   return (
     <Link
-      className="w-[800px] h-[180px] pt-[24px] pb-[24px] block my-1"
+      className="w-[620px] h-[180px] pt-[24px] pb-[24px] block my-1"
       href={`/writing/${pageId}/${title}`}
     >
       <div className="flex gap-[36px] justify-between">
