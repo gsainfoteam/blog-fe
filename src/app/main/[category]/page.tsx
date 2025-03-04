@@ -2,12 +2,14 @@ import Writing from "@/app/components/Writing/writing";
 import { Client } from "@notionhq/client";
 import {
   BlockObjectResponse,
+  GetDatabaseResponse,
   GetUserResponse,
   QueryDatabaseResponse,
   RichTextItemResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import { QueryDatabaseParameters } from "@notionhq/client/build/src/api-endpoints";
 import { ListBlockChildrenResponseResults } from "notion-to-md/build/types";
+import TagGroup from "./TagGroup";
 
 const notionKey: string = process.env.NOTION_SECRET_KEY || "NOTION_SECRET_KEY";
 const notionDatabaseKey =
@@ -15,7 +17,7 @@ const notionDatabaseKey =
 const notion = new Client({ auth: notionKey });
 
 function isRichTextItemResponse(
-  item: RichTextItemResponse[] |  Record<string, never>
+  item: RichTextItemResponse[] | Record<string, never>
 ): item is RichTextItemResponse[] {
   return (item as RichTextItemResponse[])[0].type === "text";
 }
@@ -67,6 +69,31 @@ async function getUser(userId: string): Promise<GetUserResponse> {
   }
 }
 
+type TagProperties = {
+  id: string;
+  name: string;
+  color: string;
+  description: string | null;
+};
+
+async function getTags(): Promise<string[]> {
+  try {
+    const response: GetDatabaseResponse = await notion.databases.retrieve({
+      database_id: notionDatabaseKey,
+    });
+    if (response.properties["태그"].type == "multi_select") {
+      const tagProperties: TagProperties[] =
+        response.properties["태그"].multi_select.options;
+      const tags = tagProperties.map((tag) => {
+        return tag.name;
+      });
+      return tags;
+    } else return [];
+  } catch (err) {
+    console.error("Error retrieving data:", err);
+    throw new Error("Failed to fetch Notion data.");
+  }
+}
 interface CategorizedPageProps {
   params: Promise<{ category: string }>;
 }
@@ -77,6 +104,7 @@ export default async function CategorizedPage({
   let { category } = await params;
   category = decodeURIComponent(category);
   const response = await getNotionData(category);
+  const tags = await getTags();
   const data = response.results;
   const scheme_text: string[] = [];
   const preview_image: string[] = [];
@@ -128,37 +156,42 @@ export default async function CategorizedPage({
     } else user_names.push("Unknown User");
   }
 
-  return data.map((elm, index) => {
-    let title;
-    let createdTime;
-    if ("properties" in elm && elm.properties["Name"].type === "title") {
-      const RichTextitme = elm.properties["Name"].title;
-      if (isRichTextItemResponse(RichTextitme)) {
-        title = RichTextitme[0].plain_text;
-      } else {
-        title = "Unknwon title";
-      }
-    } else {
-      title = "Unknown title";
-    }
-    if ("created_time" in elm) {
-      createdTime = elm.created_time;
-    } else {
-      createdTime = "2005-01-18";
-    }
-    const pageId = elm.id;
-    const createdUserId = user_names[index];
-    const createdTimeSliced = createdTime.slice(0, 10);
-    return (
-      <Writing
-        key={pageId}
-        title={title}
-        content={scheme_text[index]}
-        date={createdTimeSliced}
-        writer={createdUserId}
-        pageId={pageId}
-        imageUrl={preview_image[index]}
-      />
-    );
-  });
+  return (
+    <div>
+      <TagGroup tags={tags} category={category}/>
+      {data.map((elm, index) => {
+        let title;
+        let createdTime;
+        if ("properties" in elm && elm.properties["Name"].type === "title") {
+          const RichTextitme = elm.properties["Name"].title;
+          if (isRichTextItemResponse(RichTextitme)) {
+            title = RichTextitme[0].plain_text;
+          } else {
+            title = "Unknwon title";
+          }
+        } else {
+          title = "Unknown title";
+        }
+        if ("created_time" in elm) {
+          createdTime = elm.created_time;
+        } else {
+          createdTime = "2005-01-18";
+        }
+        const pageId = elm.id;
+        const createdUserId = user_names[index];
+        const createdTimeSliced = createdTime.slice(0, 10);
+        return (
+          <Writing
+            key={pageId}
+            title={title}
+            content={scheme_text[index]}
+            date={createdTimeSliced}
+            writer={createdUserId}
+            pageId={pageId}
+            imageUrl={preview_image[index]}
+          />
+        );
+      })}
+    </div>
+  );
 }
