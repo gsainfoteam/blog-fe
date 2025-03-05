@@ -2,14 +2,13 @@ import Writing from "@/app/components/Writing/writing";
 import { Client } from "@notionhq/client";
 import {
   BlockObjectResponse,
-  GetDatabaseResponse,
   GetUserResponse,
   QueryDatabaseResponse,
   RichTextItemResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import { QueryDatabaseParameters } from "@notionhq/client/build/src/api-endpoints";
 import { ListBlockChildrenResponseResults } from "notion-to-md/build/types";
-import TagGroup from "./TagGroup";
+import TagGroup from "../TagGroup";
 
 const notionKey: string = process.env.NOTION_SECRET_KEY || "NOTION_SECRET_KEY";
 const notionDatabaseKey =
@@ -69,42 +68,17 @@ async function getUser(userId: string): Promise<GetUserResponse> {
   }
 }
 
-type TagProperties = {
-  id: string;
-  name: string;
-  color: string;
-  description: string | null;
-};
-
-async function getTags(): Promise<string[]> {
-  try {
-    const response: GetDatabaseResponse = await notion.databases.retrieve({
-      database_id: notionDatabaseKey,
-    });
-    if (response.properties["태그"].type == "multi_select") {
-      const tagProperties: TagProperties[] =
-        response.properties["태그"].multi_select.options;
-      const tags = tagProperties.map((tag) => {
-        return tag.name;
-      });
-      return tags;
-    } else return [];
-  } catch (err) {
-    console.error("Error retrieving data:", err);
-    throw new Error("Failed to fetch Notion data.");
-  }
-}
 interface CategorizedPageProps {
-  params: Promise<{ category: string }>;
+  params: Promise<{ category: string; tags: { tags: string[] | undefined } }>;
 }
 
 export default async function CategorizedPage({
   params,
 }: CategorizedPageProps) {
-  let { category } = await params;
+  let { category, tags: j } = await params;
+  console.log(j);
   category = decodeURIComponent(category);
   const response = await getNotionData(category);
-  const tags = await getTags();
   const data = response.results;
   const scheme_text: string[] = [];
   const preview_image: string[] = [];
@@ -193,7 +167,7 @@ export default async function CategorizedPage({
           );
         })}
       </div>
-      <TagGroup tags={tags} category={category} />
+      <TagGroup category={category} />
     </div>
   );
 }
