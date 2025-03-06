@@ -21,7 +21,11 @@ function isRichTextItemResponse(
   return (item as RichTextItemResponse[])[0].type === "text";
 }
 
-async function getNotionData(category: string): Promise<QueryDatabaseResponse> {
+async function getNotionData(
+  category: string,
+  tag: string
+): Promise<QueryDatabaseResponse> {
+  console.log(category, tag);
   try {
     let query: QueryDatabaseParameters;
     if (category !== "전체") {
@@ -34,7 +38,40 @@ async function getNotionData(category: string): Promise<QueryDatabaseResponse> {
           },
         },
       };
-    } else {
+    }
+     else if (category !== "전체" && tag !== "Notag") {
+      query = {
+        database_id: notionDatabaseKey,
+        filter: {
+          and: [
+            {
+              property: "카테고리",
+              select: {
+                equals: category,
+              },
+            },
+            {
+              property: "태그",
+              multi_select: {
+                contains: tag,
+              },
+            },
+          ],
+        },
+      };
+    }
+    else if (category === "전체" && tag !== "Notag") {
+      query = {
+        database_id: notionDatabaseKey,
+        filter: {
+          property: "태그",
+          multi_select: {
+            contains: tag,
+          },
+        },
+      };
+    }
+    else {
       query = {
         database_id: notionDatabaseKey,
       };
@@ -69,16 +106,21 @@ async function getUser(userId: string): Promise<GetUserResponse> {
 }
 
 interface CategorizedPageProps {
-  params: Promise<{ category: string; tags: { tags: string[] | undefined } }>;
+  params: Promise<{ category: string; tags:string[] | undefined }>;
 }
 
 export default async function CategorizedPage({
   params,
 }: CategorizedPageProps) {
-  let { category, tags: j } = await params;
-  console.log(j);
+  let { category } = await params;
+  const { tags } = await params;
   category = decodeURIComponent(category);
-  const response = await getNotionData(category);
+  let response;
+  if (tags == undefined) {
+    response = await getNotionData(category, "Notag");
+  } else {
+    response = await getNotionData(category, tags[0]);
+  }
   const data = response.results;
   const scheme_text: string[] = [];
   const preview_image: string[] = [];
