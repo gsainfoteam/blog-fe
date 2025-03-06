@@ -40,7 +40,7 @@ interface TagGroupProps {
 export default async function TagGroup({ category }: TagGroupProps) {
   const tags = await getTags();
   return (
-    <div className="flex flex-wrap gap-2 w-[200px]">
+    <div className="flex flex-wrap gap-2 w-[200px] sticky top-20">
       {tags.map((tag, index) => (
         <TagButton key={index} tag={tag} currentCategory={category} />
       ))}
