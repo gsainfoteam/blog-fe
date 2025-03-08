@@ -19,7 +19,10 @@ async function getTags(): Promise<string[]> {
     const response: GetDatabaseResponse = await notion.databases.retrieve({
       database_id: notionDatabaseKey,
     });
-    if (response.properties["태그"].type == "multi_select") {
+    if (
+      response.properties["태그"] &&
+      response.properties["태그"].type == "multi_select"
+    ) {
       const tagProperties: TagProperties[] =
         response.properties["태그"].multi_select.options;
       const tags = tagProperties.map((tag) => {
