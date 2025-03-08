@@ -8,6 +8,7 @@ import {
 } from "@notionhq/client/build/src/api-endpoints";
 import { QueryDatabaseParameters } from "@notionhq/client/build/src/api-endpoints";
 import { ListBlockChildrenResponseResults } from "notion-to-md/build/types";
+import TagGroup from "../TagGroup";
 
 const notionKey: string = process.env.NOTION_SECRET_KEY || "NOTION_SECRET_KEY";
 const notionDatabaseKey =
@@ -15,12 +16,16 @@ const notionDatabaseKey =
 const notion = new Client({ auth: notionKey });
 
 function isRichTextItemResponse(
-  item: RichTextItemResponse[] |  Record<string, never>
+  item: RichTextItemResponse[] | Record<string, never>
 ): item is RichTextItemResponse[] {
   return (item as RichTextItemResponse[])[0].type === "text";
 }
 
-async function getNotionData(category: string): Promise<QueryDatabaseResponse> {
+async function getNotionData(
+  category: string,
+  tag: string
+): Promise<QueryDatabaseResponse> {
+  console.log(category, tag);
   try {
     let query: QueryDatabaseParameters;
     if (category !== "전체") {
@@ -33,7 +38,40 @@ async function getNotionData(category: string): Promise<QueryDatabaseResponse> {
           },
         },
       };
-    } else {
+    }
+     else if (category !== "전체" && tag !== "Notag") {
+      query = {
+        database_id: notionDatabaseKey,
+        filter: {
+          and: [
+            {
+              property: "카테고리",
+              select: {
+                equals: category,
+              },
+            },
+            {
+              property: "태그",
+              multi_select: {
+                contains: tag,
+              },
+            },
+          ],
+        },
+      };
+    }
+    else if (category === "전체" && tag !== "Notag") {
+      query = {
+        database_id: notionDatabaseKey,
+        filter: {
+          property: "태그",
+          multi_select: {
+            contains: tag,
+          },
+        },
+      };
+    }
+    else {
       query = {
         database_id: notionDatabaseKey,
       };
@@ -68,15 +106,21 @@ async function getUser(userId: string): Promise<GetUserResponse> {
 }
 
 interface CategorizedPageProps {
-  params: Promise<{ category: string }>;
+  params: Promise<{ category: string; tags:string[] | undefined }>;
 }
 
 export default async function CategorizedPage({
   params,
 }: CategorizedPageProps) {
   let { category } = await params;
+  const { tags } = await params;
   category = decodeURIComponent(category);
-  const response = await getNotionData(category);
+  let response;
+  if (tags == undefined) {
+    response = await getNotionData(category, "Notag");
+  } else {
+    response = await getNotionData(category, tags[0]);
+  }
   const data = response.results;
   const scheme_text: string[] = [];
   const preview_image: string[] = [];
@@ -128,37 +172,44 @@ export default async function CategorizedPage({
     } else user_names.push("Unknown User");
   }
 
-  return data.map((elm, index) => {
-    let title;
-    let createdTime;
-    if ("properties" in elm && elm.properties["Name"].type === "title") {
-      const RichTextitme = elm.properties["Name"].title;
-      if (isRichTextItemResponse(RichTextitme)) {
-        title = RichTextitme[0].plain_text;
-      } else {
-        title = "Unknwon title";
-      }
-    } else {
-      title = "Unknown title";
-    }
-    if ("created_time" in elm) {
-      createdTime = elm.created_time;
-    } else {
-      createdTime = "2005-01-18";
-    }
-    const pageId = elm.id;
-    const createdUserId = user_names[index];
-    const createdTimeSliced = createdTime.slice(0, 10);
-    return (
-      <Writing
-        key={pageId}
-        title={title}
-        content={scheme_text[index]}
-        date={createdTimeSliced}
-        writer={createdUserId}
-        pageId={pageId}
-        imageUrl={preview_image[index]}
-      />
-    );
-  });
+  return (
+    <div className="flex items-start justify-between">
+      <div className="flex flex-col">
+        {data.map((elm, index) => {
+          let title;
+          let createdTime;
+          if ("properties" in elm && elm.properties["Name"].type === "title") {
+            const RichTextitme = elm.properties["Name"].title;
+            if (isRichTextItemResponse(RichTextitme)) {
+              title = RichTextitme[0].plain_text;
+            } else {
+              title = "Unknwon title";
+            }
+          } else {
+            title = "Unknown title";
+          }
+          if ("created_time" in elm) {
+            createdTime = elm.created_time;
+          } else {
+            createdTime = "2005-01-18";
+          }
+          const pageId = elm.id;
+          const createdUserId = user_names[index];
+          const createdTimeSliced = createdTime.slice(0, 10);
+          return (
+            <Writing
+              key={pageId}
+              title={title}
+              content={scheme_text[index]}
+              date={createdTimeSliced}
+              writer={createdUserId}
+              pageId={pageId}
+              imageUrl={preview_image[index]}
+            />
+          );
+        })}
+      </div>
+      <TagGroup category={category} />
+    </div>
+  );
 }
