@@ -8,15 +8,17 @@ interface MainLayoutProps {
   params: Promise<{ category: string }>;
 }
 
-export default async function MainLayout({ children, params }: MainLayoutProps) {
-  const {category} = await params
-  const currentCategory = decodeURIComponent(category);
+export default async function MainLayout({
+  children,
+  params,
+}: MainLayoutProps) {
+  const { category: category } = await params;
   return (
     <>
       <Image src={Banner} alt="Content Image" width={900} />
 
       <div className="my-[20px]">
-        <Category currentCategory={currentCategory} />
+        <Category currentCategory={category} />
       </div>
 
       <div className="flex-col">{children}</div>
