@@ -8,7 +8,7 @@ export default function Category({
 }: {
   currentCategory: string;
 }) {
-  const category = ["전체", "기술", "문화"];
+  const category = ["all", "tech", "culture"];
   const currentFilter: boolean[] = [];
   for (const elm of category) {
     if (elm === currentCategory) currentFilter.push(true);

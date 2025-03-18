@@ -20,10 +20,10 @@ interface CategorizedPageProps {
 
 export default async function CategorizedPage({
   params,
-}: CategorizedPageProps) {
-  let { category } = await params;
+}: CategorizedPageProps) {    
+  const { category } = await params;
   const { tags } = await params;
-  category = decodeURIComponent(category);
+  // category = decodeURIComponent(category);
   let response;
   if (tags == undefined) {
     response = await getNotionData(category, "Notag");

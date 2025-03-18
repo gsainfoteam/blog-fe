@@ -16,54 +16,32 @@ export default async function getNotionData(
   category: string,
   tag: string
 ): Promise<QueryDatabaseResponse> {
-  console.log(category, tag);
   try {
-    let query: QueryDatabaseParameters;
-    if (category !== "전체") {
-      query = {
-        database_id: notionDatabaseKey,
-        filter: {
-          property: "카테고리",
-          select: {
-            equals: category,
-          },
-        },
-      };
-    } else if (category !== "전체" && tag !== "Notag") {
-      query = {
-        database_id: notionDatabaseKey,
-        filter: {
-          and: [
-            {
-              property: "카테고리",
-              select: {
-                equals: category,
-              },
-            },
-            {
-              property: "태그",
-              multi_select: {
-                contains: tag,
-              },
-            },
-          ],
-        },
-      };
-    } else if (category === "전체" && tag !== "Notag") {
-      query = {
-        database_id: notionDatabaseKey,
-        filter: {
-          property: "태그",
-          multi_select: {
-            contains: tag,
-          },
-        },
-      };
-    } else {
-      query = {
-        database_id: notionDatabaseKey,
-      };
+    
+    const filters = [];
+    const categoryForAPI = (category === "tech")? "기술": (category === "culture")? "문화" : "all";
+    if (category !== "all") {
+      filters.push({
+        property: "카테고리",
+        select: { equals: categoryForAPI },
+      });
     }
+
+    if (tag !== "Notag") {
+      filters.push({
+        property: "태그",
+        multi_select: { contains: tag },
+      });
+    }
+
+    const query: QueryDatabaseParameters = {
+      database_id: notionDatabaseKey,
+      filter: filters.length
+        ? filters.length > 1
+          ? { and: filters }
+          : filters[0]
+        : undefined,
+    };
 
     const response = await notion.databases.query(query);
     return response;
@@ -124,7 +102,7 @@ export async function getTags(): Promise<string[]> {
   }
 }
 
-export async function getNotionPage(pageId : string) {
+export async function getNotionPage(pageId: string) {
   try {
     const response = await notion.pages.retrieve({ page_id: pageId });
     return response;
