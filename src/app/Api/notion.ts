@@ -5,6 +5,7 @@ import {
 } from "@notionhq/client/build/src/api-endpoints";
 import { QueryDatabaseParameters } from "@notionhq/client/build/src/api-endpoints";
 import { ListBlockChildrenResponseResults } from "notion-to-md/build/types";
+import { GetDatabaseResponse } from "@notionhq/client/build/src/api-endpoints";
 
 const notionKey: string = process.env.NOTION_SECRET_KEY || "NOTION_SECRET_KEY";
 const notionDatabaseKey =
@@ -91,5 +92,34 @@ export async function getUser(userId: string): Promise<GetUserResponse> {
   } catch (err) {
     console.error("Error retrieving data:", err);
     throw new Error("Fail to load user");
+  }
+}
+
+type TagProperties = {
+  id: string;
+  name: string;
+  color: string;
+  description: string | null;
+};
+
+export async function getTags(): Promise<string[]> {
+  try {
+    const response: GetDatabaseResponse = await notion.databases.retrieve({
+      database_id: notionDatabaseKey,
+    });
+    if (
+      response.properties["태그"] &&
+      response.properties["태그"].type == "multi_select"
+    ) {
+      const tagProperties: TagProperties[] =
+        response.properties["태그"].multi_select.options;
+      const tags = tagProperties.map((tag) => {
+        return tag.name;
+      });
+      return tags;
+    } else return [];
+  } catch (err) {
+    console.error("Error retrieving data:", err);
+    throw new Error("Failed to fetch Notion data.");
   }
 }
