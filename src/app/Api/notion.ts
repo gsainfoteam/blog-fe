@@ -123,3 +123,13 @@ export async function getTags(): Promise<string[]> {
     throw new Error("Failed to fetch Notion data.");
   }
 }
+
+export async function getNotionPage(pageId : string) {
+  try {
+    const response = await notion.pages.retrieve({ page_id: pageId });
+    return response;
+  } catch (err) {
+    console.error("Error retrieving page:", err);
+    throw new Error("Failed to fetch Notion data.");
+  }
+}
