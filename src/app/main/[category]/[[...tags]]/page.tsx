@@ -1,19 +1,12 @@
 import Writing from "@/app/components/Writing/writing";
-import { Client } from "@notionhq/client";
 import {
   BlockObjectResponse,
-  GetUserResponse,
-  QueryDatabaseResponse,
   RichTextItemResponse,
 } from "@notionhq/client/build/src/api-endpoints";
-import { QueryDatabaseParameters } from "@notionhq/client/build/src/api-endpoints";
-import { ListBlockChildrenResponseResults } from "notion-to-md/build/types";
 import TagGroup from "../TagGroup";
-
-const notionKey: string = process.env.NOTION_SECRET_KEY || "NOTION_SECRET_KEY";
-const notionDatabaseKey =
-  process.env.NOTION_DATABASE_KEY || "NOTION_DATABASE_KEY";
-const notion = new Client({ auth: notionKey });
+import getNotionData from "@/app/Api/notion";
+import { getBlockChildren } from "@/app/Api/notion";
+import { getUser } from "@/app/Api/notion";
 
 function isRichTextItemResponse(
   item: RichTextItemResponse[] | Record<string, never>
@@ -21,100 +14,16 @@ function isRichTextItemResponse(
   return (item as RichTextItemResponse[])[0].type === "text";
 }
 
-async function getNotionData(
-  category: string,
-  tag: string
-): Promise<QueryDatabaseResponse> {
-  console.log(category, tag);
-  try {
-    let query: QueryDatabaseParameters;
-    if (category !== "전체") {
-      query = {
-        database_id: notionDatabaseKey,
-        filter: {
-          property: "카테고리",
-          select: {
-            equals: category,
-          },
-        },
-      };
-    }
-     else if (category !== "전체" && tag !== "Notag") {
-      query = {
-        database_id: notionDatabaseKey,
-        filter: {
-          and: [
-            {
-              property: "카테고리",
-              select: {
-                equals: category,
-              },
-            },
-            {
-              property: "태그",
-              multi_select: {
-                contains: tag,
-              },
-            },
-          ],
-        },
-      };
-    }
-    else if (category === "전체" && tag !== "Notag") {
-      query = {
-        database_id: notionDatabaseKey,
-        filter: {
-          property: "태그",
-          multi_select: {
-            contains: tag,
-          },
-        },
-      };
-    }
-    else {
-      query = {
-        database_id: notionDatabaseKey,
-      };
-    }
-
-    const response = await notion.databases.query(query);
-    return response;
-  } catch (err) {
-    console.error("Error retrieving data:", err);
-    throw new Error("Failed to fetch Notion data.");
-  }
-}
-async function getBlockChildren(
-  blockId: string
-): Promise<ListBlockChildrenResponseResults> {
-  try {
-    const response = await notion.blocks.children.list({ block_id: blockId });
-    return response.results;
-  } catch (err) {
-    console.error("Error retrieving data:", err);
-    throw new Error("Failed to fetch Notion data.");
-  }
-}
-async function getUser(userId: string): Promise<GetUserResponse> {
-  try {
-    const response = await notion.users.retrieve({ user_id: userId });
-    return response;
-  } catch (err) {
-    console.error("Error retrieving data:", err);
-    throw new Error("Fail to load user");
-  }
-}
-
 interface CategorizedPageProps {
-  params: Promise<{ category: string; tags:string[] | undefined }>;
+  params: Promise<{ category: string; tags: string[] | undefined }>;
 }
 
 export default async function CategorizedPage({
   params,
-}: CategorizedPageProps) {
-  let { category } = await params;
+}: CategorizedPageProps) {    
+  const { category } = await params;
   const { tags } = await params;
-  category = decodeURIComponent(category);
+  // category = decodeURIComponent(category);
   let response;
   if (tags == undefined) {
     response = await getNotionData(category, "Notag");

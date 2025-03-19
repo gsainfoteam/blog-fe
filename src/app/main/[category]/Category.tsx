@@ -3,15 +3,24 @@
 import { useState } from "react";
 import CategroyButton from "../../components/CategoryButton/CategoryButton";
 
+type Category = {
+  content: string;
+  url: string;
+};
+
 export default function Category({
   currentCategory,
 }: {
   currentCategory: string;
 }) {
-  const category = ["전체", "기술", "문화"];
+  const category: Category[] = [
+    { content: "전체", url: "all" },
+    { content: "기술", url: "tech" },
+    { content: "문화", url: "culture" },
+  ];
   const currentFilter: boolean[] = [];
   for (const elm of category) {
-    if (elm === currentCategory) currentFilter.push(true);
+    if (elm.url === currentCategory) currentFilter.push(true);
     else currentFilter.push(false);
   }
   const [filter, setFilter] = useState<boolean[]>(currentFilter);
@@ -21,13 +30,14 @@ export default function Category({
     newArr[idx] = true;
     setFilter(newArr);
   };
+  
   return (
     <>
       {category.map((elm, index) => (
         <CategroyButton
           key={index}
           filter={filter}
-          elm={elm}
+          category={elm}
           index={index}
           handleClick={handleClick}
         />
