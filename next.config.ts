@@ -8,14 +8,14 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/",
-        destination: "/main/전체",
+        destination: "/main/all",
         permanent: true,
       },
       {
         source: "/main",
-        destination: "/main/전체",
+        destination: "/main/all",
         permanent: true,
-      }  
+      },
     ];
   },
   output: "standalone",
