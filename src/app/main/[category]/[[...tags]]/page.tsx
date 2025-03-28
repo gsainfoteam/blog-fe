@@ -4,9 +4,11 @@ import {
   RichTextItemResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import TagGroup from "../TagGroup";
-import getNotionData from "@/app/Api/notion";
-import { getBlockChildren } from "@/app/Api/notion";
-import { getUser } from "@/app/Api/notion";
+import {
+  getBlockChildrenWithCache,
+  getNotionDataWithCache,
+  getUserWithCache,
+} from "@/app/Api/notion";
 
 function isRichTextItemResponse(
   item: RichTextItemResponse[] | Record<string, never>
@@ -20,62 +22,55 @@ interface CategorizedPageProps {
 
 export default async function CategorizedPage({
   params,
-}: CategorizedPageProps) {    
+}: CategorizedPageProps) {
   const { category } = await params;
   const { tags } = await params;
-  // category = decodeURIComponent(category);
-  let response;
-  if (tags == undefined) {
-    response = await getNotionData(category, "Notag");
-  } else {
-    response = await getNotionData(category, tags[0]);
-  }
+  const response = await getNotionDataWithCache(
+    category,
+    tags === undefined ? "Notag" : tags[0]
+  );
+
   const data = response.results;
   const scheme_text: string[] = [];
   const preview_image: string[] = [];
   const user_names: string[] = [];
 
   for (const item of data) {
-    try {
-      const blockChildren = await getBlockChildren(item.id);
-      let isThereParagraph = false;
-      let isTherePictrue = false;
-
-      for (let i = 0; i < blockChildren.length; i++) {
-        const block = blockChildren[i];
-        if ((block as BlockObjectResponse).type === undefined) break;
-        if ("type" in block) {
-          if (block.type === "paragraph" && !isThereParagraph) {
-            isThereParagraph = true;
-            const text = block.paragraph.rich_text[0].plain_text;
-            scheme_text.push(text);
-          }
-          if (block.type === "image" && !isTherePictrue) {
-            isTherePictrue = true;
-            let pictureUrl;
-            if (block.image.type === "external")
-              pictureUrl = block.image.external.url;
-            else if (block.image.type === "file")
-              pictureUrl = block.image.file.url;
-            else pictureUrl = "No PreviewImage";
-            preview_image.push(pictureUrl);
-          }
-          if (isThereParagraph && isTherePictrue) break;
+    const blockChildren = (await getBlockChildrenWithCache(item.id)).results;
+    let isThereParagraph = false;
+    let isTherePictrue = false;
+    for (let i = 0; i < blockChildren.length; i++) {
+      const block = blockChildren[i];
+      if ((block as BlockObjectResponse).type === undefined) break;
+      if ("type" in block) {
+        if (block.type === "paragraph" && !isThereParagraph) {
+          isThereParagraph = true;
+          const text = block.paragraph.rich_text[0].plain_text;
+          scheme_text.push(text);
         }
+        if (block.type === "image" && !isTherePictrue) {
+          isTherePictrue = true;
+          let pictureUrl;
+          if (block.image.type === "external")
+            pictureUrl = block.image.external.url;
+          else if (block.image.type === "file")
+            pictureUrl = block.image.file.url;
+          else pictureUrl = "No PreviewImage";
+          preview_image.push(pictureUrl);
+        }
+        if (isThereParagraph && isTherePictrue) break;
       }
-      if (!isThereParagraph)
-        scheme_text.push(
-          "아직 노션에 작성된 글이 없어요. 인포팀 블로그 노션 페이지로 가서 글을 작성해주세요!!"
-        );
-      if (!isTherePictrue) preview_image.push("No PreviewImage");
-    } catch (err) {
-      console.log(err);
     }
+    if (!isThereParagraph)
+      scheme_text.push(
+        "아직 노션에 작성된 글이 없어요. 인포팀 블로그 노션 페이지로 가서 글을 작성해주세요!!"
+      );
+    if (!isTherePictrue) preview_image.push("No PreviewImage");
   }
   for (const item of data) {
     if ("created_by" in item) {
       const userId = item.created_by.id;
-      const userInfo = await getUser(userId);
+      const userInfo = await getUserWithCache(userId);
       if (userInfo.name) user_names.push(userInfo.name);
       else user_names.push("Unknown User");
     } else user_names.push("Unknown User");

@@ -1,10 +1,9 @@
 import { Client } from "@notionhq/client";
 import {
   GetUserResponse,
+  ListBlockChildrenResponse,
   QueryDatabaseResponse,
 } from "@notionhq/client/build/src/api-endpoints";
-import { QueryDatabaseParameters } from "@notionhq/client/build/src/api-endpoints";
-import { ListBlockChildrenResponseResults } from "notion-to-md/build/types";
 import { GetDatabaseResponse } from "@notionhq/client/build/src/api-endpoints";
 
 const notionKey: string = process.env.NOTION_SECRET_KEY || "NOTION_SECRET_KEY";
@@ -12,14 +11,14 @@ const notionDatabaseKey =
   process.env.NOTION_DATABASE_KEY || "NOTION_DATABASE_KEY";
 const notion = new Client({ auth: notionKey });
 
-export default async function getNotionData(
+export async function getNotionDataWithCache(
   category: string,
   tag: string
 ): Promise<QueryDatabaseResponse> {
   try {
-    
     const filters = [];
-    const categoryForAPI = (category === "tech")? "기술": (category === "culture")? "문화" : "all";
+    const categoryForAPI =
+      category === "tech" ? "기술" : category === "culture" ? "문화" : "all";
     if (category !== "all") {
       filters.push({
         property: "카테고리",
@@ -34,8 +33,7 @@ export default async function getNotionData(
       });
     }
 
-    const query: QueryDatabaseParameters = {
-      database_id: notionDatabaseKey,
+    const query = {
       filter: filters.length
         ? filters.length > 1
           ? { and: filters }
@@ -43,20 +41,42 @@ export default async function getNotionData(
         : undefined,
     };
 
-    const response = await notion.databases.query(query);
-    return response;
+    const response = await fetch(
+      `https://api.notion.com/v1/databases/${notionDatabaseKey}/query`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${notionKey}`,
+          "Content-Type": "application/json",
+          "Notion-Version": "2022-06-28",
+        },
+        body: JSON.stringify(query),
+        cache: "force-cache",
+      }
+    );
+    return response.json();
   } catch (err) {
     console.error("Error retrieving data:", err);
     throw new Error("Failed to fetch Notion data.");
   }
 }
 
-export async function getBlockChildren(
+export async function getBlockChildrenWithCache(
   blockId: string
-): Promise<ListBlockChildrenResponseResults> {
+): Promise<ListBlockChildrenResponse> {
   try {
-    const response = await notion.blocks.children.list({ block_id: blockId });
-    return response.results;
+    const response = await fetch(
+      `https://api.notion.com/v1/blocks/${blockId}/children`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${notionKey}`,
+          "Notion-Version": "2022-06-28",
+        },
+        cache: "force-cache",
+      }
+    );
+    return response.json();
   } catch (err) {
     console.error("Error retrieving data:", err);
     throw new Error("Failed to fetch Notion data.");
@@ -67,6 +87,22 @@ export async function getUser(userId: string): Promise<GetUserResponse> {
   try {
     const response = await notion.users.retrieve({ user_id: userId });
     return response;
+  } catch (err) {
+    console.error("Error retrieving data:", err);
+    throw new Error("Fail to load user");
+  }
+}
+export async function getUserWithCache(userId: string) {
+  try {
+    const response = await fetch(`https://api.notion.com/v1/users/${userId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${notionKey}`,
+        "Notion-Version": "2022-06-28",
+      },
+      cache: "force-cache",
+    });
+    return response.json();
   } catch (err) {
     console.error("Error retrieving data:", err);
     throw new Error("Fail to load user");
