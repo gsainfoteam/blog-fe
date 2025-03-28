@@ -7,8 +7,8 @@ import TagGroup from "../TagGroup";
 import {
   getBlockChildrenWithCache,
   getNotionDataWithCache,
+  getUserWithCache,
 } from "@/app/Api/notion";
-import { getUser } from "@/app/Api/notion";
 
 function isRichTextItemResponse(
   item: RichTextItemResponse[] | Record<string, never>
@@ -70,7 +70,7 @@ export default async function CategorizedPage({
   for (const item of data) {
     if ("created_by" in item) {
       const userId = item.created_by.id;
-      const userInfo = await getUser(userId);
+      const userInfo = await getUserWithCache(userId);
       if (userInfo.name) user_names.push(userInfo.name);
       else user_names.push("Unknown User");
     } else user_names.push("Unknown User");

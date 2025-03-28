@@ -92,6 +92,22 @@ export async function getUser(userId: string): Promise<GetUserResponse> {
     throw new Error("Fail to load user");
   }
 }
+export async function getUserWithCache(userId: string) {
+  try {
+    const response = await fetch(`https://api.notion.com/v1/users/${userId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${notionKey}`,
+        "Notion-Version": "2022-06-28",
+      },
+      cache: "force-cache",
+    });
+    return response.json();
+  } catch (err) {
+    console.error("Error retrieving data:", err);
+    throw new Error("Fail to load user");
+  }
+}
 
 type TagProperties = {
   id: string;
