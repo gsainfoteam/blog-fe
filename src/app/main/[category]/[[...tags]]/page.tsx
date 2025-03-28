@@ -4,7 +4,7 @@ import {
   RichTextItemResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import TagGroup from "../TagGroup";
-import getNotionData from "@/app/Api/notion";
+import { getNotionDataWithCache } from "@/app/Api/notion";
 import { getBlockChildren } from "@/app/Api/notion";
 import { getUser } from "@/app/Api/notion";
 
@@ -23,13 +23,8 @@ export default async function CategorizedPage({
 }: CategorizedPageProps) {    
   const { category } = await params;
   const { tags } = await params;
-  // category = decodeURIComponent(category);
-  let response;
-  if (tags == undefined) {
-    response = await getNotionData(category, "Notag");
-  } else {
-    response = await getNotionData(category, tags[0]);
-  }
+  const response = await getNotionDataWithCache(category, (tags===undefined) ? "Notag" : tags[0]);
+  
   const data = response.results;
   const scheme_text: string[] = [];
   const preview_image: string[] = [];
