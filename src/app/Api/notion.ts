@@ -52,6 +52,7 @@ export async function getNotionDataWithCache(
           "Notion-Version": "2022-06-28",
         },
         body: JSON.stringify(query),
+        cache: "force-cache",
       }
     );
     return response.json();
