@@ -47,9 +47,12 @@ export async function getNotionData(
 export async function getBlockChildren(
   blockId: string
 ): Promise<ListBlockChildrenResponse> {
-  return notion.blocks.children.list({
-    block_id: blockId,
-  });
+  try {
+    return notion.blocks.children.list({ block_id: blockId });
+  } catch (err) {
+    console.error("Error retrieving data:", err);
+    throw new Error("Failed to fetch Notion data.");
+  }
 }
 
 export async function getUser(userId: string): Promise<GetUserResponse> {
