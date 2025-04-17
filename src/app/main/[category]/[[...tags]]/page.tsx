@@ -4,11 +4,7 @@ import {
   RichTextItemResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import TagGroup from "../TagGroup";
-import {
-  getBlockChildrenWithCache,
-  getNotionDataWithCache,
-  getUserWithCache,
-} from "@/app/Api/notion";
+import { getBlockChildren, getNotionData, getUser } from "@/app/Api/notion";
 
 function isRichTextItemResponse(
   item: RichTextItemResponse[] | Record<string, never>
@@ -25,7 +21,7 @@ export default async function CategorizedPage({
 }: CategorizedPageProps) {
   const { category } = await params;
   const { tags } = await params;
-  const response = await getNotionDataWithCache(
+  const response = await getNotionData(
     category,
     tags === undefined ? "Notag" : tags[0]
   );
@@ -36,7 +32,7 @@ export default async function CategorizedPage({
   const user_names: string[] = [];
 
   for (const item of data) {
-    const blockChildren = (await getBlockChildrenWithCache(item.id)).results;
+    const blockChildren = (await getBlockChildren(item.id)).results;
     let isThereParagraph = false;
     let isTherePictrue = false;
     for (let i = 0; i < blockChildren.length; i++) {
@@ -70,7 +66,7 @@ export default async function CategorizedPage({
   for (const item of data) {
     if ("created_by" in item) {
       const userId = item.created_by.id;
-      const userInfo = await getUserWithCache(userId);
+      const userInfo = await getUser(userId);
       if (userInfo.name) user_names.push(userInfo.name);
       else user_names.push("Unknown User");
     } else user_names.push("Unknown User");
