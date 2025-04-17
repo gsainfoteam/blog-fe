@@ -15,7 +15,7 @@ export default async function MainLayout({
   const { category: category } = await params;
   return (
     <>
-      <Image src={Banner} alt="Content Image" width={900} />
+      <Image src={Banner} alt="Content Image" width={900} priority />
 
       <div className="my-[20px]">
         <Category currentCategory={category} />

@@ -33,6 +33,7 @@ export default function Writing({
         <div className="relative w-[130px] h-[90px]">
           <Image
             src={imageUrl === "No PreviewImage" ? DefaultImage : imageUrl}
+            sizes="130px"
             alt="Content Image"
             className="rounded-lg object-cover "
             fill
