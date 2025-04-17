@@ -34,8 +34,8 @@ export default function Writing({
           <Image
             src={imageUrl === "No PreviewImage" ? DefaultImage : imageUrl}
             alt="Content Image"
-            className="rounded-lg object-cover"
-            layout="fill"
+            className="rounded-lg object-cover "
+            fill
           />
         </div>
       </div>
