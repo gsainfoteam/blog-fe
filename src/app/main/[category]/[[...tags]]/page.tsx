@@ -7,6 +7,8 @@ interface CategorizedPageProps {
   params: Promise<{ category: string; tags: string[] | undefined }>;
 }
 
+export const revalidate = 3600;
+
 export default async function CategorizedPage({
   params,
 }: CategorizedPageProps) {
@@ -21,7 +23,7 @@ export default async function CategorizedPage({
     <div className="flex items-start justify-between">
       <div className="flex flex-col">
         {response.results.map((item) => (
-          <Suspense key={item.id} fallback={<div>Loading...</div>}>
+          <Suspense key={item.id}>
             <ArticleItem item={item} />
           </Suspense>
         ))}

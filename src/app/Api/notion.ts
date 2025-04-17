@@ -80,13 +80,8 @@ export async function getBlockChildren(
 
 export async function getUser(userId: string): Promise<GetUserResponse> {
   try {
-    return fetch(`https://api.notion.com/v1/users/${userId}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${notionKey}`,
-        "Notion-Version": "2022-06-28",
-      },
-    }).then((res) => res.json());
+    const response = await notion.users.retrieve({ user_id: userId });
+    return response;
   } catch (err) {
     console.error("Error retrieving data:", err);
     throw new Error("Fail to load user");
