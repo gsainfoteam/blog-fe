@@ -45,7 +45,7 @@ export default async function CategorizedPage({
       if ("type" in block) {
         if (block.type === "paragraph" && !isThereParagraph) {
           isThereParagraph = true;
-          const text = block.paragraph.rich_text[0].plain_text;
+          const text = block.paragraph.rich_text[0]?.plain_text ?? "";
           scheme_text.push(text);
         }
         if (block.type === "image" && !isTherePictrue) {
