@@ -44,17 +44,11 @@ export async function getNotionData(
       ],
     } satisfies NonNullable<QueryDatabaseParameters["filter"]>;
 
-    return fetch(
-      `https://api.notion.com/v1/databases/${notionDatabaseKey}/query`,
-      {
-        method: "POST",
-        body: JSON.stringify({ filter: filters }),
-        headers: {
-          Authorization: `Bearer ${notionKey}`,
-          "Notion-Version": "2022-06-28",
-        },
-      }
-    ).then((res) => res.json());
+    const response = await notion.databases.query({
+      database_id: notionDatabaseKey,
+      filter: filters,
+    });
+    return response;
   } catch (err) {
     console.error("Error retrieving data:", err);
     throw new Error("Failed to fetch Notion data.");
@@ -65,13 +59,7 @@ export async function getBlockChildren(
   blockId: string
 ): Promise<ListBlockChildrenResponse> {
   try {
-    return fetch(`https://api.notion.com/v1/blocks/${blockId}/children`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${notionKey}`,
-        "Notion-Version": "2022-06-28",
-      },
-    }).then((res) => res.json());
+    return notion.blocks.children.list({ block_id: blockId });
   } catch (err) {
     console.error("Error retrieving data:", err);
     throw new Error("Failed to fetch Notion data.");
