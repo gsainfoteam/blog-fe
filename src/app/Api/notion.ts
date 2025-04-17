@@ -30,6 +30,17 @@ export async function getNotionData(
         ...(tag !== "Notag"
           ? [{ property: "태그", multi_select: { contains: tag } }]
           : []),
+        {
+          or: [
+            { property: "Status", status: { equals: "Published" } },
+            ...(process.env.NODE_ENV === "development"
+              ? [
+                  { property: "Status", status: { equals: "In Progress" } },
+                  { property: "Status", status: { equals: "Pending" } },
+                ]
+              : []),
+          ],
+        },
       ],
     } satisfies NonNullable<QueryDatabaseParameters["filter"]>;
 
