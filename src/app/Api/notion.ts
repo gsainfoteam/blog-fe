@@ -56,11 +56,10 @@ export async function getNotionData(
 }
 
 export async function getBlockChildren(
-  blockId: string,
-  size: number = 4
+  blockId: string
 ): Promise<ListBlockChildrenResponse> {
   try {
-    return notion.blocks.children.list({ block_id: blockId, page_size: size });
+    return notion.blocks.children.list({ block_id: blockId });
   } catch (err) {
     console.error("Error retrieving data:", err);
     throw new Error("Failed to fetch Notion data.");
