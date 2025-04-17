@@ -44,11 +44,17 @@ export async function getNotionData(
       ],
     } satisfies NonNullable<QueryDatabaseParameters["filter"]>;
 
-    const response = await notion.databases.query({
-      database_id: notionDatabaseKey,
-      filter: filters,
-    });
-    return response;
+    return fetch(
+      `https://api.notion.com/v1/databases/${notionDatabaseKey}/query`,
+      {
+        method: "POST",
+        body: JSON.stringify({ filter: filters }),
+        headers: {
+          Authorization: `Bearer ${notionKey}`,
+          "Notion-Version": "2022-06-28",
+        },
+      }
+    ).then((res) => res.json());
   } catch (err) {
     console.error("Error retrieving data:", err);
     throw new Error("Failed to fetch Notion data.");
@@ -59,7 +65,13 @@ export async function getBlockChildren(
   blockId: string
 ): Promise<ListBlockChildrenResponse> {
   try {
-    return notion.blocks.children.list({ block_id: blockId });
+    return fetch(`https://api.notion.com/v1/blocks/${blockId}/children`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${notionKey}`,
+        "Notion-Version": "2022-06-28",
+      },
+    }).then((res) => res.json());
   } catch (err) {
     console.error("Error retrieving data:", err);
     throw new Error("Failed to fetch Notion data.");
@@ -68,8 +80,13 @@ export async function getBlockChildren(
 
 export async function getUser(userId: string): Promise<GetUserResponse> {
   try {
-    const response = await notion.users.retrieve({ user_id: userId });
-    return response;
+    return fetch(`https://api.notion.com/v1/users/${userId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${notionKey}`,
+        "Notion-Version": "2022-06-28",
+      },
+    }).then((res) => res.json());
   } catch (err) {
     console.error("Error retrieving data:", err);
     throw new Error("Fail to load user");
