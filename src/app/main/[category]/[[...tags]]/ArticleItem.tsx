@@ -1,43 +1,34 @@
-import { getBlockChildren, getUser } from "@/app/Api/notion";
+import { getUser } from "@/app/Api/notion";
 import Writing from "@/app/components/Writing/writing";
 import {
-  BlockObjectResponse,
-  QueryDatabaseResponse,
+  FilesPropertyItemObjectResponse,
+  PageObjectResponse,
   RichTextItemResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 
 function isRichTextItemResponse(
   item: RichTextItemResponse[] | Record<string, never>
 ): item is RichTextItemResponse[] {
-  return (item as RichTextItemResponse[])[0].type === "text";
+  return (item as RichTextItemResponse[])[0]?.type === "text";
 }
 
-const getArticle = async (item: QueryDatabaseResponse["results"][number]) => {
-  const blockChildren = (await getBlockChildren(item.id)).results;
-  let text =
-    "아직 노션에 작성된 글이 없어요. 인포팀 블로그 노션 페이지로 가서 글을 작성해주세요!!";
-  let imageUrl = "No PreviewImage";
-  let isThereParagraph = false;
-  let isTherePicture = false;
+function getPlainText(item: RichTextItemResponse[] | Record<string, never>) {
+  return isRichTextItemResponse(item) ? item[0].plain_text : undefined;
+}
 
-  for (const block of blockChildren) {
-    if ((block as BlockObjectResponse).type === undefined) break;
-    if ("type" in block) {
-      if (block.type === "paragraph" && !isThereParagraph) {
-        isThereParagraph = true;
-        text = block.paragraph.rich_text[0]?.plain_text ?? text;
-      }
-      if (block.type === "image" && !isTherePicture) {
-        isTherePicture = true;
-        if (block.image.type === "external") {
-          imageUrl = block.image.external.url;
-        } else if (block.image.type === "file") {
-          imageUrl = block.image.file.url;
-        }
-      }
-      if (isThereParagraph && isTherePicture) break;
-    }
-  }
+function getFileUrl(item: FilesPropertyItemObjectResponse["files"]) {
+  if (item.length === 0) return undefined;
+  return "file" in item[0] ? item[0].file.url : item[0].external.url;
+}
+
+const getArticle = async (item: PageObjectResponse) => {
+  const properties = "properties" in item ? item.properties : {};
+  if (properties["Summary"].type !== "rich_text")
+    throw new Error("Summary is not a rich text");
+  const text = getPlainText(properties["Summary"].rich_text);
+  if (properties["Featured Image"].type !== "files")
+    throw new Error("Featured Image is not a files");
+  const imageUrl = getFileUrl(properties["Featured Image"].files);
 
   const userName =
     "created_by" in item
@@ -46,7 +37,6 @@ const getArticle = async (item: QueryDatabaseResponse["results"][number]) => {
         )
       : "Unknown User";
 
-  const properties = "properties" in item ? item.properties : {};
   return {
     id: item.id,
     title:
@@ -67,7 +57,7 @@ const getArticle = async (item: QueryDatabaseResponse["results"][number]) => {
 export default async function ArticleItem({
   item,
 }: {
-  item: QueryDatabaseResponse["results"][number];
+  item: PageObjectResponse;
 }) {
   const content = await getArticle(item);
   return (

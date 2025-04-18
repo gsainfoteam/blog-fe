@@ -2,6 +2,7 @@ import { getNotionData } from "@/app/Api/notion";
 import TagGroup from "../TagGroup";
 import ArticleItem from "./ArticleItem";
 import { Suspense } from "react";
+import { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 
 interface CategorizedPageProps {
   params: Promise<{ category: string; tags: string[] | undefined }>;
@@ -24,7 +25,7 @@ export default async function CategorizedPage({
       <div className="flex flex-col">
         {response.results.map((item) => (
           <Suspense key={item.id}>
-            <ArticleItem item={item} />
+            <ArticleItem item={item as PageObjectResponse} />
           </Suspense>
         ))}
       </div>
