@@ -1,14 +1,16 @@
 import Image from "next/image";
 import DefaultImage from "@/app/image/default.svg";
 import Link from "next/link";
+
 type WritingProps = {
   title: string;
-  content: string;
+  content?: string;
   date: string;
   writer: string;
   pageId: string;
-  imageUrl: string;
+  imageUrl?: string;
 };
+
 export default function Writing({
   title,
   content,
@@ -32,11 +34,11 @@ export default function Writing({
         </div>
         <div className="relative w-[130px] h-[90px]">
           <Image
-            src={imageUrl === "No PreviewImage" ? DefaultImage : imageUrl}
+            src={imageUrl ?? DefaultImage}
+            sizes="130px"
             alt="Content Image"
-            className="rounded-lg"
-            layout="fill"
-            objectFit="cover"
+            className="rounded-lg object-cover "
+            fill
           />
         </div>
       </div>

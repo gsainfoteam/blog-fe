@@ -2,6 +2,7 @@ import { Client } from "@notionhq/client";
 import {
   GetUserResponse,
   ListBlockChildrenResponse,
+  QueryDatabaseParameters,
   QueryDatabaseResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import { GetDatabaseResponse } from "@notionhq/client/build/src/api-endpoints";
@@ -11,72 +12,54 @@ const notionDatabaseKey =
   process.env.NOTION_DATABASE_KEY || "NOTION_DATABASE_KEY";
 const notion = new Client({ auth: notionKey });
 
-export async function getNotionDataWithCache(
+export async function getNotionData(
   category: string,
   tag: string
 ): Promise<QueryDatabaseResponse> {
   try {
-    const filters = [];
-    const categoryForAPI =
-      category === "tech" ? "기술" : category === "culture" ? "문화" : "all";
-    if (category !== "all") {
-      filters.push({
-        property: "카테고리",
-        select: { equals: categoryForAPI },
-      });
-    }
-
-    if (tag !== "Notag") {
-      filters.push({
-        property: "태그",
-        multi_select: { contains: tag },
-      });
-    }
-
-    const query = {
-      filter: filters.length
-        ? filters.length > 1
-          ? { and: filters }
-          : filters[0]
-        : undefined,
-    };
-
-    const response = await fetch(
-      `https://api.notion.com/v1/databases/${notionDatabaseKey}/query`,
+    const mappedCategory =
       {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${notionKey}`,
-          "Content-Type": "application/json",
-          "Notion-Version": "2022-06-28",
+        tech: "기술",
+        culture: "문화",
+      }[category] ?? "all";
+    const filters = {
+      and: [
+        ...(category !== "all"
+          ? [{ property: "카테고리", select: { equals: mappedCategory } }]
+          : []),
+        ...(tag !== "Notag"
+          ? [{ property: "태그", multi_select: { contains: tag } }]
+          : []),
+        {
+          or: [
+            { property: "Status", status: { equals: "Published" } },
+            ...(process.env.NODE_ENV === "development"
+              ? [
+                  { property: "Status", status: { equals: "In Progress" } },
+                  { property: "Status", status: { equals: "Pending" } },
+                ]
+              : []),
+          ],
         },
-        body: JSON.stringify(query),
-        cache: "force-cache",
-      }
-    );
-    return response.json();
+      ],
+    } satisfies NonNullable<QueryDatabaseParameters["filter"]>;
+
+    const response = await notion.databases.query({
+      database_id: notionDatabaseKey,
+      filter: filters,
+    });
+    return response;
   } catch (err) {
     console.error("Error retrieving data:", err);
     throw new Error("Failed to fetch Notion data.");
   }
 }
 
-export async function getBlockChildrenWithCache(
+export async function getBlockChildren(
   blockId: string
 ): Promise<ListBlockChildrenResponse> {
   try {
-    const response = await fetch(
-      `https://api.notion.com/v1/blocks/${blockId}/children`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${notionKey}`,
-          "Notion-Version": "2022-06-28",
-        },
-        cache: "force-cache",
-      }
-    );
-    return response.json();
+    return notion.blocks.children.list({ block_id: blockId });
   } catch (err) {
     console.error("Error retrieving data:", err);
     throw new Error("Failed to fetch Notion data.");
@@ -87,22 +70,6 @@ export async function getUser(userId: string): Promise<GetUserResponse> {
   try {
     const response = await notion.users.retrieve({ user_id: userId });
     return response;
-  } catch (err) {
-    console.error("Error retrieving data:", err);
-    throw new Error("Fail to load user");
-  }
-}
-export async function getUserWithCache(userId: string) {
-  try {
-    const response = await fetch(`https://api.notion.com/v1/users/${userId}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${notionKey}`,
-        "Notion-Version": "2022-06-28",
-      },
-      cache: "force-cache",
-    });
-    return response.json();
   } catch (err) {
     console.error("Error retrieving data:", err);
     throw new Error("Fail to load user");

@@ -25,6 +25,7 @@ export default function NotionWrapper({
     <NotionRenderer
       recordMap={recordMap}
       components={{ Code, Collection, Equation, Modal, Pdf }}
+      disableHeader
       fullPage={true}
       darkMode={false}
     />
