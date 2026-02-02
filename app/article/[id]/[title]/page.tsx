@@ -15,21 +15,23 @@ export default async function DetailPage({ params }: DetailPageProps) {
   const urlPageId = pageId.replace(/-/g, "");
   const recordMap = await notionAPI.getPage(pageId);
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center mb-32">
       <NotionWrapper recordMap={recordMap} />
-      <div className="flex flex-col items-end my-[50px]">
+      <div className="flex flex-col items-end mb-8">
         <ShareButton
           url={`https://www.notion.so/infoteam-rulrudino/${urlPageId}`}
         />
       </div>
-      <h4>인포팀에서 함께 일하고 싶다면?</h4>
+      <div className="flex flex-col items-center gap-2">
+        <h4>인포팀에서 함께 일하고 싶다면?</h4>
 
-      <Link
-        href="/"
-        className="text-sm px-[12px] py-[8px] rounded-[5px] border-2 border-[#FF4500] text-[#FF4500]"
-      >
-        지원 바로가기
-      </Link>
+        <Link
+          href="/"
+          className="text-sm px-[12px] py-[8px] rounded-[5px] border-2 border-[#FF4500] text-[#FF4500]"
+        >
+          지원 바로가기
+        </Link>
+      </div>
     </div>
   );
 }
