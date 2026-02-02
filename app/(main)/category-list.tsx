@@ -10,7 +10,7 @@ export default function CategoryList({
   currentCategory: string;
 }) {
   const category = [
-    { content: "전체", url: "main" },
+    { content: "전체", url: "" },
     { content: "기술", url: "tech" },
     { content: "문화", url: "culture" },
   ];
@@ -26,7 +26,7 @@ export default function CategoryList({
       {category.map((elm, index) => (
         <CategoryButton
           key={index}
-          selected={current === elm.url || (!current && elm.url === "main")}
+          selected={current === elm.url || (!current && elm.url === "")}
           category={elm}
         />
       ))}

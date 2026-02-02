@@ -1,9 +1,9 @@
 import { getNotionData } from "@/utils/notion";
-import CategoryList from "../category-list";
+import CategoryList from "./category-list";
 // import TagGroup from "../tag-group";
 import { categories } from "@/utils/const";
 import { Suspense } from "react";
-import ArticleItem from "../article-item";
+import ArticleItem from "./article-item";
 
 export default async function MainPage() {
   const response = await getNotionData(null, null);
