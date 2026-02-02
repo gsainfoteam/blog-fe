@@ -13,9 +13,9 @@ export default function RootLayout({
 }>) {
   return (
     <html>
-      <body className="flex flex-col items-center py-[100px]">
+      <body className="flex flex-col items-center px-4">
         <Navbar />
-        <main className="w-[900px]">{children}</main>
+        <main className="max-w-[900px] mt-4">{children}</main>
       </body>
     </html>
   );
