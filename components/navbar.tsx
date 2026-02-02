@@ -9,12 +9,16 @@ export default function Navbar() {
       <div className="flex gap-[16px]">
         <Link
           href="https://introduce.gistory.me/"
+          target="_blank"
+          rel="noopener"
           className="px-[12px] py-[8px]"
         >
           소개
         </Link>
         <Link
           href="https://www.notion.so/infoteam-rulrudino/185365ea27df802683e0c7374f964784"
+          target="_blank"
+          rel="noopener"
           className="text-sm px-[12px] py-[8px] rounded-[5px] border-2 border-[#FF4500] text-[#FF4500]"
         >
           지원 바로가기
