@@ -36,9 +36,15 @@ export default async function DetailPage({ params }: DetailPageProps) {
 
 export async function generateStaticParams() {
   const data = await getNotionData(null, null);
-  const result = data.map((page) => ({
-    id: page.id,
-    title: encodeURI(getTitle(page)),
-  }));
+  const result = data.flatMap((page) => [
+    {
+      id: page.id,
+      title: encodeURI(getTitle(page)),
+    },
+    {
+      id: page.id,
+      title: getTitle(page),
+    },
+  ]);
   return result;
 }
