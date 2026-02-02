@@ -6,26 +6,19 @@ type Category = {
 };
 
 type CategoryButtonProps = {
-  filter: boolean[];
+  selected: boolean;
   category: Category;
-  index: number;
-  handleClick: (idx: number) => void;
 };
 export default function CategoryButton({
-  filter,
+  selected,
   category,
-  index,
-  handleClick,
 }: CategoryButtonProps) {
   return (
     <Link href={`/${category.url}`} className="mr-[15px]">
       <button
         className={`w-[61px] h-[43px] p-[12px] rounded-[24px] text-sm ${
-          filter[index]
-            ? "bg-[#FF4500] text-white"
-            : "bg-[#E8E8E8] text-gray-600"
+          selected ? "bg-[#FF4500] text-white" : "bg-[#E8E8E8] text-gray-600"
         }`}
-        onClick={() => handleClick(index)}
       >
         {category.content}
       </button>

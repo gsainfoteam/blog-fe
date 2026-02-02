@@ -1,19 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { Category } from "@/utils/const";
+import { useParams } from "next/navigation";
 import CategoryButton from "./category-button";
-
-type Category = {
-  content: string;
-  url: string;
-};
 
 export default function CategoryList({
   currentCategory,
 }: {
   currentCategory: string;
 }) {
-  const category: Category[] = [
+  const category = [
     { content: "전체", url: "main" },
     { content: "기술", url: "tech" },
     { content: "문화", url: "culture" },
@@ -23,23 +19,15 @@ export default function CategoryList({
     if (elm.url === currentCategory) currentFilter.push(true);
     else currentFilter.push(false);
   }
-  const [filter, setFilter] = useState<boolean[]>(currentFilter);
-
-  const handleClick = (idx: number) => {
-    const newArr = Array(category.length).fill(false);
-    newArr[idx] = true;
-    setFilter(newArr);
-  };
+  const { category: current } = useParams<{ category: Category }>();
 
   return (
     <>
       {category.map((elm, index) => (
         <CategoryButton
           key={index}
-          filter={filter}
+          selected={current === elm.url || (!current && elm.url === "main")}
           category={elm}
-          index={index}
-          handleClick={handleClick}
         />
       ))}
     </>
