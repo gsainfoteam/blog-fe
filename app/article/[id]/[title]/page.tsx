@@ -17,7 +17,7 @@ export default async function DetailPage({ params }: DetailPageProps) {
   return (
     <div className="flex flex-col items-center">
       <NotionWrapper recordMap={recordMap} />
-      <div className="flex flex-col items-end w-[900px] my-[50px]">
+      <div className="flex flex-col items-end my-[50px]">
         <ShareButton
           url={`https://www.notion.so/infoteam-rulrudino/${urlPageId}`}
         />
