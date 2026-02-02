@@ -40,6 +40,5 @@ export async function generateStaticParams() {
     id: page.id,
     title: encodeURI(getTitle(page)),
   }));
-  console.log(result);
   return result;
 }
