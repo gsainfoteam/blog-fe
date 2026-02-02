@@ -2,6 +2,8 @@ import Link from "next/link";
 import { NotionAPI } from "notion-client";
 import NotionWrapper from "./notion-wrapper";
 import ShareButton from "./share-button";
+import { getNotionData } from "@/utils/notion";
+import { getTitle } from "@/app/(main)/article-item";
 
 const notionAPI = new NotionAPI();
 
@@ -31,4 +33,14 @@ export default async function DetailPage({ params }: DetailPageProps) {
       </Link>
     </div>
   );
+}
+
+export async function generateStaticParams() {
+  const data = await getNotionData(null, null);
+  const result = data.map((page) => ({
+    id: page.id,
+    title: encodeURI(getTitle(page)),
+  }));
+  console.log(result);
+  return result;
 }

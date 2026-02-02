@@ -21,6 +21,14 @@ function getFileUrl(item: FilesPropertyItemObjectResponse["files"]) {
   return "file" in item[0] ? item[0].file.url : item[0].external.url;
 }
 
+export const getTitle = (item: PageObjectResponse) => {
+  return item.properties["Name"].type === "title"
+    ? isRichTextItemResponse(item.properties["Name"].title)
+      ? item.properties["Name"].title[0].plain_text
+      : "Unknown title"
+    : "Unknown title";
+};
+
 const getArticle = async (item: PageObjectResponse) => {
   const properties = "properties" in item ? item.properties : {};
   if (properties["Summary"].type !== "rich_text")
@@ -39,12 +47,7 @@ const getArticle = async (item: PageObjectResponse) => {
 
   return {
     id: item.id,
-    title:
-      properties["Name"].type === "title"
-        ? isRichTextItemResponse(properties["Name"].title)
-          ? properties["Name"].title[0].plain_text
-          : "Unknown title"
-        : "Unknown title",
+    title: getTitle(item),
     text,
     imageUrl,
     userName,
