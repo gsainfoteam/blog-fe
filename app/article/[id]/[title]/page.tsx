@@ -14,7 +14,6 @@ export default async function DetailPage({ params }: DetailPageProps) {
   const { id: pageId } = await params;
   const urlPageId = pageId.replace(/-/g, "");
   const recordMap = await notionAPI.getPage(pageId);
-  if (!recordMap) return <div>loading...</div>;
   return (
     <div className="flex flex-col items-center">
       <NotionWrapper recordMap={recordMap} />
