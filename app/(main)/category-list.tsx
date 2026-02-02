@@ -8,7 +8,7 @@ type Category = {
   url: string;
 };
 
-export default function Category({
+export default function CategoryList({
   currentCategory,
 }: {
   currentCategory: string;

@@ -18,7 +18,7 @@ export default function CategoryButton({
   handleClick,
 }: CategoryButtonProps) {
   return (
-    <Link href={`/main/${category.url}`} className="mr-[15px]">
+    <Link href={`/${category.url}`} className="mr-[15px]">
       <button
         className={`w-[61px] h-[43px] p-[12px] rounded-[24px] text-sm ${
           filter[index]
