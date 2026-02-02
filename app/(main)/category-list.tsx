@@ -14,7 +14,7 @@ export default function CategoryList({
   currentCategory: string;
 }) {
   const category: Category[] = [
-    { content: "전체", url: "all" },
+    { content: "전체", url: "main" },
     { content: "기술", url: "tech" },
     { content: "문화", url: "culture" },
   ];
