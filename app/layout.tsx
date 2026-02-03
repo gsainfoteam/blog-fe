@@ -4,6 +4,7 @@ import Navbar from "@/components/navbar";
 
 export const metadata: Metadata = {
   title: "INFOTEAM BLOG",
+  metadataBase: "https://blog.gistory.me",
 };
 
 export default function RootLayout({
