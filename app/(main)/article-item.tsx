@@ -30,7 +30,7 @@ export const getTitle = (item: PageObjectResponse) => {
 };
 
 const getArticle = async (item: PageObjectResponse) => {
-  const properties = "properties" in item ? item.properties : {};
+  const properties = item.properties;
   if (properties["Summary"].type !== "rich_text")
     throw new Error("Summary is not a rich text");
   const text = getPlainText(properties["Summary"].rich_text);
@@ -38,12 +38,9 @@ const getArticle = async (item: PageObjectResponse) => {
     throw new Error("Featured Image is not a files");
   const imageUrl = getFileUrl(properties["Featured Image"].files);
 
-  const userName =
-    "created_by" in item
-      ? await getUser(item.created_by.id).then(
-          (user) => user.name ?? "Unknown User"
-        )
-      : "Unknown User";
+  const userName = await getUser(item.created_by.id).then(
+    (user) => user.name ?? "Unknown User"
+  );
 
   return {
     id: item.id,
@@ -52,8 +49,7 @@ const getArticle = async (item: PageObjectResponse) => {
     imageUrl,
     userName,
     properties,
-    createdTime:
-      "created_time" in item ? item.created_time.slice(0, 10) : "2005-01-18",
+    createdTime: item.created_time.slice(0, 10),
   };
 };
 
