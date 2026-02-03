@@ -4,11 +4,12 @@ import NotionWrapper from "./notion-wrapper";
 import ShareButton from "./share-button";
 import { getNotionData, getProperties } from "@/utils/notion";
 import { getTitle } from "@/app/(main)/article-item";
-import { Metadata } from "next";
+import { Metadata, ResolvedMetadata } from "next";
 import { cache } from "react";
 
+const notionAPI = new NotionAPI();
+
 const getPage = cache(async (id: string) => {
-  const notionAPI = new NotionAPI();
   return notionAPI.getPage(id);
 });
 
@@ -16,7 +17,11 @@ type Props = {
   params: Promise<{ id: string; title: string }>;
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: Props,
+  parent: Promise<ResolvedMetadata>
+): Promise<Metadata> {
+  const parentMetadata = await parent;
   const { id: pageId, title: originalTitle } = await params;
   const title = decodeURIComponent(originalTitle);
   const recordMap = await getPage(pageId);
@@ -27,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const thumbnail =
     page.value.properties[
       decodeURIComponent(properties["Featured Image"].id)
-    ]?.[0][0];
+    ]?.[0][1][0][1];
   const description =
     page.value.properties[decodeURIComponent(properties["Summary"].id)]?.[0][0];
 
@@ -37,7 +42,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: title,
       type: "article",
-      images: thumbnail,
+      images: thumbnail
+        ? (
+            await notionAPI.getSignedFileUrls([
+              {
+                permissionRecord: { table: "block", id: pageId },
+                url: thumbnail,
+              },
+            ])
+          ).signedUrls[0]
+        : parentMetadata.openGraph?.images,
       description,
     },
   };
