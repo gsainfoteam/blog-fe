@@ -25,7 +25,7 @@ export default function ArticleCard({
       href={`/article/${pageId}/${title}`}
     >
       <div className="flex gap-[36px] justify-between">
-        <div className="flex flex-col justify-between">
+        <div className="flex flex-col justify-between flex-1">
           <strong>{title}</strong>
           <p>{content}</p>
           <p>
@@ -37,7 +37,7 @@ export default function ArticleCard({
             src={imageUrl ?? DefaultImage}
             sizes="130px"
             alt="Content Image"
-            className="rounded-lg object-cover "
+            className="rounded-lg object-contain"
             fill
           />
         </div>
