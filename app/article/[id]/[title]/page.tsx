@@ -17,16 +17,19 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id: pageId, title } = await params;
+  const { id: pageId, title: originalTitle } = await params;
+  const title = decodeURIComponent(originalTitle);
   const recordMap = await getPage(pageId);
   const page = Object.values(recordMap.block).find(
     (b) => b.value.type === "page"
   )!;
   const properties = await getProperties();
   const thumbnail =
-    page.value.properties[decodeURI(properties["Featured Image"].id)]?.[0][0];
+    page.value.properties[
+      decodeURIComponent(properties["Featured Image"].id)
+    ]?.[0][0];
   const description =
-    page.value.properties[decodeURI(properties["Summary"].id)]?.[0][0];
+    page.value.properties[decodeURIComponent(properties["Summary"].id)]?.[0][0];
 
   return {
     title,
