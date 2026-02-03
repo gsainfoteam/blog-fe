@@ -14,7 +14,8 @@ const notion = new Client({ auth: notionKey });
 
 export async function getNotionData(
   category: Category | null,
-  tag: string | null
+  tag: string | null,
+  cursor?: string
 ): Promise<PageObjectResponse[]> {
   try {
     const filters = {
@@ -48,8 +49,14 @@ export async function getNotionData(
           timestamp: "created_time",
         },
       ],
+      start_cursor: cursor,
     });
-    return response.results.filter(isFullPage);
+    return [
+      ...response.results.filter(isFullPage),
+      ...(response.has_more && response.next_cursor
+        ? await getNotionData(category, tag, response.next_cursor)
+        : []),
+    ];
   } catch (err) {
     console.error("Error retrieving data:", err);
     throw new Error("Failed to fetch Notion data.");
