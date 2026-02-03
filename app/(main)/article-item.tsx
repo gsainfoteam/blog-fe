@@ -16,9 +16,17 @@ function getPlainText(item: RichTextItemResponse[] | Record<string, never>) {
   return isRichTextItemResponse(item) ? item[0].plain_text : undefined;
 }
 
-function getFileUrl(item: FilesPropertyItemObjectResponse["files"]) {
+function getFileUrl(
+  item: FilesPropertyItemObjectResponse["files"],
+  id?: string
+) {
   if (item.length === 0) return undefined;
-  return "file" in item[0] ? item[0].file.url : item[0].external.url;
+  const url = "file" in item[0] ? item[0].file.url : item[0].external.url;
+  if (!id) return url;
+  const parsed = new URL(url);
+  const chunk = parsed.pathname.split("/");
+  const path = `attachment:${chunk.at(-2)}:${chunk.at(-1)}`;
+  return `https://www.notion.so/image/${encodeURI(path)}?table=block&id=${id}`;
 }
 
 export const getTitle = (item: PageObjectResponse) => {
@@ -36,7 +44,7 @@ const getArticle = async (item: PageObjectResponse) => {
   const text = getPlainText(properties["Summary"].rich_text);
   if (properties["Featured Image"].type !== "files")
     throw new Error("Featured Image is not a files");
-  const imageUrl = getFileUrl(properties["Featured Image"].files);
+  const imageUrl = getFileUrl(properties["Featured Image"].files, item.id);
 
   const userName = await getUser(item.created_by.id).then(
     (user) => user.name ?? "Unknown User"
