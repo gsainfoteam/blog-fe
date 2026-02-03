@@ -42,6 +42,12 @@ export async function getNotionData(
     const response = await notion.dataSources.query({
       data_source_id: notionDataSourceId,
       filter: filters,
+      sorts: [
+        {
+          direction: "descending",
+          timestamp: "created_time",
+        },
+      ],
     });
     return response.results.filter(isFullPage);
   } catch (err) {
