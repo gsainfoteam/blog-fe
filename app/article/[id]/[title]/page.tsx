@@ -11,15 +11,14 @@ interface DetailPageProps {
   params: Promise<{ id: string; title: string }>;
 }
 export default async function DetailPage({ params }: DetailPageProps) {
-  const { id: pageId } = await params;
-  const urlPageId = pageId.replace(/-/g, "");
+  const { id: pageId, title } = await params;
   const recordMap = await notionAPI.getPage(pageId);
   return (
     <div className="flex flex-col items-center mb-32">
       <NotionWrapper recordMap={recordMap} />
       <div className="flex flex-col items-end mb-8">
         <ShareButton
-          url={`https://www.notion.so/infoteam-rulrudino/${urlPageId}`}
+          url={`https://blog.gistory.me/article/${pageId}/${title}`}
         />
       </div>
       <div className="flex flex-col items-center gap-2">
