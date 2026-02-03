@@ -63,6 +63,13 @@ export async function getNotionData(
   }
 }
 
+export async function getProperties() {
+  const dataSource = await notion.dataSources.retrieve({
+    data_source_id: notionDataSourceId,
+  });
+  return dataSource.properties;
+}
+
 export async function getBlockChildren(
   blockId: string
 ): Promise<ListBlockChildrenResponse> {

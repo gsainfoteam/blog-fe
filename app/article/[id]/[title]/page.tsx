@@ -2,17 +2,47 @@ import Link from "next/link";
 import { NotionAPI } from "notion-client";
 import NotionWrapper from "./notion-wrapper";
 import ShareButton from "./share-button";
-import { getNotionData } from "@/utils/notion";
+import { getNotionData, getProperties } from "@/utils/notion";
 import { getTitle } from "@/app/(main)/article-item";
+import { Metadata } from "next";
+import { cache } from "react";
 
-const notionAPI = new NotionAPI();
+const getPage = cache(async (id: string) => {
+  const notionAPI = new NotionAPI();
+  return notionAPI.getPage(id);
+});
 
-interface DetailPageProps {
+type Props = {
   params: Promise<{ id: string; title: string }>;
-}
-export default async function DetailPage({ params }: DetailPageProps) {
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id: pageId, title } = await params;
-  const recordMap = await notionAPI.getPage(pageId);
+  const recordMap = await getPage(pageId);
+  const page = Object.values(recordMap.block).find(
+    (b) => b.value.type === "page"
+  )!;
+  const properties = await getProperties();
+  const thumbnail =
+    page.value.properties[decodeURI(properties["Featured Image"].id)]?.[0][0];
+  const description =
+    page.value.properties[decodeURI(properties["Summary"].id)]?.[0][0];
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title: title,
+      type: "article",
+      images: thumbnail,
+      description,
+    },
+  };
+}
+
+export default async function DetailPage({ params }: Props) {
+  const { id: pageId, title } = await params;
+  const recordMap = await getPage(pageId);
   return (
     <div className="flex flex-col items-center mb-32">
       <NotionWrapper recordMap={recordMap} />
