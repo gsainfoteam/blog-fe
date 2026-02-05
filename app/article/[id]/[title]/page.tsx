@@ -1,11 +1,15 @@
+import { getTitle } from "@/app/(main)/article-item";
+import {
+  getNotionData,
+  getPermanentFileLink,
+  getProperties,
+} from "@/utils/notion";
+import { Metadata, ResolvedMetadata } from "next";
 import Link from "next/link";
 import { NotionAPI } from "notion-client";
+import { cache } from "react";
 import NotionWrapper from "./notion-wrapper";
 import ShareButton from "./share-button";
-import { getNotionData, getProperties } from "@/utils/notion";
-import { getTitle } from "@/app/(main)/article-item";
-import { Metadata, ResolvedMetadata } from "next";
-import { cache } from "react";
 
 const notionAPI = new NotionAPI();
 
@@ -19,14 +23,14 @@ type Props = {
 
 export async function generateMetadata(
   { params }: Props,
-  parent: Promise<ResolvedMetadata>
+  parent: Promise<ResolvedMetadata>,
 ): Promise<Metadata> {
   const parentMetadata = await parent;
   const { id: pageId, title: originalTitle } = await params;
   const title = decodeURIComponent(originalTitle);
   const recordMap = await getPage(pageId);
   const page = Object.values(recordMap.block).find(
-    (b) => b.value.type === "page"
+    (b) => b.value.type === "page",
   )!;
   const properties = await getProperties();
   const thumbnail =
@@ -43,14 +47,7 @@ export async function generateMetadata(
       title: title,
       type: "article",
       images: thumbnail
-        ? (
-            await notionAPI.getSignedFileUrls([
-              {
-                permissionRecord: { table: "block", id: pageId },
-                url: thumbnail,
-              },
-            ])
-          ).signedUrls[0]
+        ? getPermanentFileLink(thumbnail, pageId)
         : parentMetadata.openGraph?.images,
       description,
     },

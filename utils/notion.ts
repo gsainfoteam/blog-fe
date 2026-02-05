@@ -15,7 +15,7 @@ const notion = new Client({ auth: notionKey });
 export async function getNotionData(
   category: Category | null,
   tag: string | null,
-  cursor?: string
+  cursor?: string,
 ): Promise<PageObjectResponse[]> {
   try {
     const filters = {
@@ -71,7 +71,7 @@ export async function getProperties() {
 }
 
 export async function getBlockChildren(
-  blockId: string
+  blockId: string,
 ): Promise<ListBlockChildrenResponse> {
   try {
     return notion.blocks.children.list({ block_id: blockId });
@@ -128,4 +128,11 @@ export async function getNotionPage(pageId: string) {
     console.error("Error retrieving page:", err);
     throw new Error("Failed to fetch Notion data.");
   }
+}
+
+export function getPermanentFileLink(url: string, id: string) {
+  const parsed = new URL(url);
+  const chunk = parsed.pathname.split("/").flatMap((c) => c.split(":"));
+  const path = `attachment:${chunk.at(-2)}:${chunk.at(-1)}`;
+  return `https://www.notion.so/image/${encodeURI(path)}?table=block&id=${id}`;
 }

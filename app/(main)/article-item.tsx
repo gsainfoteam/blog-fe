@@ -1,4 +1,4 @@
-import { getUser } from "@/utils/notion";
+import { getPermanentFileLink, getUser } from "@/utils/notion";
 import {
   FilesPropertyItemObjectResponse,
   PageObjectResponse,
@@ -7,7 +7,7 @@ import {
 import ArticleCard from "./article-card";
 
 function isRichTextItemResponse(
-  item: RichTextItemResponse[] | Record<string, never>
+  item: RichTextItemResponse[] | Record<string, never>,
 ): item is RichTextItemResponse[] {
   return (item as RichTextItemResponse[])[0]?.type === "text";
 }
@@ -18,15 +18,12 @@ function getPlainText(item: RichTextItemResponse[] | Record<string, never>) {
 
 function getFileUrl(
   item: FilesPropertyItemObjectResponse["files"],
-  id?: string
+  id?: string,
 ) {
   if (item.length === 0) return undefined;
   const url = "file" in item[0] ? item[0].file.url : item[0].external.url;
   if (!id) return url;
-  const parsed = new URL(url);
-  const chunk = parsed.pathname.split("/");
-  const path = `attachment:${chunk.at(-2)}:${chunk.at(-1)}`;
-  return `https://www.notion.so/image/${encodeURI(path)}?table=block&id=${id}`;
+  return getPermanentFileLink(url, id);
 }
 
 export const getTitle = (item: PageObjectResponse) => {
@@ -47,7 +44,7 @@ const getArticle = async (item: PageObjectResponse) => {
   const imageUrl = getFileUrl(properties["Featured Image"].files, item.id);
 
   const userName = await getUser(item.created_by.id).then(
-    (user) => user.name ?? "Unknown User"
+    (user) => user.name ?? "Unknown User",
   );
 
   return {
