@@ -132,6 +132,9 @@ export async function getNotionPage(pageId: string) {
 
 export function getPermanentFileLink(url: string, id: string) {
   const parsed = new URL(url);
+  if (parsed.hostname !== "prod-files-secure.s3.us-west-2.amazonaws.com") {
+    return url;
+  }
   const chunk = parsed.pathname.split("/").flatMap((c) => c.split(":"));
   const path = `attachment:${chunk.at(-2)}:${chunk.at(-1)}`;
   return `https://www.notion.so/image/${encodeURI(path)}?table=block&id=${id}`;
