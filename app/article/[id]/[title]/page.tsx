@@ -7,6 +7,7 @@ import {
 import { Metadata, ResolvedMetadata } from "next";
 import Link from "next/link";
 import { NotionAPI } from "notion-client";
+import { getBlockValue } from "notion-utils";
 import { cache } from "react";
 import NotionWrapper from "./notion-wrapper";
 import ShareButton from "./share-button";
@@ -29,16 +30,19 @@ export async function generateMetadata(
   const { id: pageId, title: originalTitle } = await params;
   const title = decodeURIComponent(originalTitle);
   const recordMap = await getPage(pageId);
-  const page = Object.values(recordMap.block).find(
-    (b) => b.value.type === "page",
+  console.dir(recordMap, { depth: 8 });
+  const page = getBlockValue(
+    Object.values(recordMap.block).find(
+      (b) => getBlockValue(b.value)?.type === "page",
+    )!,
   )!;
   const properties = await getProperties();
   const thumbnail =
-    page.value.properties[
+    page.properties[
       decodeURIComponent(properties["Featured Image"].id)
     ]?.[0][1][0][1];
   const description =
-    page.value.properties[decodeURIComponent(properties["Summary"].id)]?.[0][0];
+    page.properties[decodeURIComponent(properties["Summary"].id)]?.[0][0];
 
   return {
     title,

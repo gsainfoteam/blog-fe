@@ -31,7 +31,7 @@ export async function getNotionData(
             { property: "Status", status: { equals: "Published" } },
             ...(process.env.NODE_ENV === "development"
               ? [
-                  { property: "Status", status: { equals: "In Progress" } },
+                  { property: "Status", status: { equals: "In progress" } },
                   { property: "Status", status: { equals: "Pending" } },
                 ]
               : []),
