@@ -26,12 +26,17 @@ function getFileUrl(
   return getPermanentFileLink(url, id);
 }
 
-export const getTitle = (item: PageObjectResponse) => {
-  return item.properties["Name"].type === "title"
-    ? isRichTextItemResponse(item.properties["Name"].title)
-      ? item.properties["Name"].title[0].plain_text
-      : "Unknown title"
-    : "Unknown title";
+export const getTitle = (item: PageObjectResponse, encode: boolean = false) => {
+  const title =
+    item.properties["Name"].type === "title"
+      ? isRichTextItemResponse(item.properties["Name"].title)
+        ? item.properties["Name"].title[0].plain_text
+        : "Unknown title"
+      : "Unknown title";
+
+  if (!encode) return title;
+  if (process.env.NODE_ENV === "development") return encodeURI(title);
+  return title;
 };
 
 const getArticle = async (item: PageObjectResponse) => {

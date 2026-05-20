@@ -30,7 +30,6 @@ export async function generateMetadata(
   const { id: pageId, title: originalTitle } = await params;
   const title = decodeURIComponent(originalTitle);
   const recordMap = await getPage(pageId);
-  console.dir(recordMap, { depth: 8 });
   const page = getBlockValue(
     Object.values(recordMap.block).find(
       (b) => getBlockValue(b.value)?.type === "page",
@@ -87,10 +86,7 @@ export async function generateStaticParams() {
   const data = await getNotionData(null, null);
   const result = data.map((page) => ({
     id: page.id,
-    title:
-      process.env.NODE_ENV === "development"
-        ? encodeURI(getTitle(page))
-        : getTitle(page),
+    title: getTitle(page, true),
   }));
   return result;
 }
