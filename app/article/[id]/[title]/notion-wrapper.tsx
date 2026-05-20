@@ -43,6 +43,7 @@ export default function NotionWrapper({
         recordMap={recordMap}
         components={{
           Code,
+          Collection: () => null,
           Equation,
           Modal,
           Pdf,
