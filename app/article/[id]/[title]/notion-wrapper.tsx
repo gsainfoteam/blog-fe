@@ -10,7 +10,6 @@ import "prismjs/themes/prism-tomorrow.css";
 // used for rendering equations (optional)
 import "katex/dist/katex.min.css";
 
-import { Collection } from "react-notion-x/build/third-party/collection";
 import { Equation } from "react-notion-x/build/third-party/equation";
 import { Modal } from "react-notion-x/build/third-party/modal";
 import { Pdf } from "react-notion-x/build/third-party/pdf";
@@ -25,8 +24,7 @@ export default function NotionWrapper({
     <div className="w-dvw">
       <NotionRenderer
         recordMap={recordMap}
-        components={{ Code, Collection, Equation, Modal, Pdf }}
-        disableHeader
+        components={{ Code, Equation, Modal, Pdf }}
         fullPage={true}
         darkMode={false}
       />
