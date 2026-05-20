@@ -13,8 +13,8 @@ export default async function Article({
   if (!isFullPage(page)) {
     notFound();
   }
-  const title = getTitle(page, true);
-  redirect(`/article/${page.id}/${title}`);
+  const title = getTitle(page);
+  redirect(`/article/${page.id}/${encodeURI(title)}`);
 }
 
 export async function generateStaticParams() {
