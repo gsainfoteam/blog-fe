@@ -2,6 +2,8 @@ import { getNotionData } from "@/utils/notion";
 import type { MetadataRoute } from "next";
 import { getTitle } from "./(main)/article-item";
 
+export const dynamic = "force-static";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const data = await getNotionData(null, null);
   const result = data.map((page) => ({
