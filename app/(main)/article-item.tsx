@@ -51,6 +51,10 @@ const getArticle = async (item: PageObjectResponse) => {
   const userName = await getUser(item.created_by.id).then(
     (user) => user.name ?? "Unknown User",
   );
+  const publishedTime =
+    properties["Published Date"].type === "date"
+      ? properties["Published Date"].date?.start
+      : undefined;
 
   return {
     id: item.id,
@@ -59,7 +63,7 @@ const getArticle = async (item: PageObjectResponse) => {
     imageUrl,
     userName,
     properties,
-    createdTime: item.created_time.slice(0, 10),
+    createdTime: publishedTime ?? item.created_time.slice(0, 10),
   };
 };
 
