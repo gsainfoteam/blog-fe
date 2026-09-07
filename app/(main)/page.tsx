@@ -10,7 +10,7 @@ export default async function MainPage() {
 
   return (
     <>
-      <div className="my-[20px]">
+      <div className="my-5">
         <CategoryList currentCategory={"all"} />
       </div>
 

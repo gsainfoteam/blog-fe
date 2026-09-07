@@ -73,7 +73,7 @@ export default async function DetailPage({ params }: Props) {
 
         <Link
           href="/"
-          className="rounded-[5px] border-2 border-[#FF4500] px-[12px] py-[8px] text-sm text-[#FF4500]"
+          className="rounded-[5px] border-2 border-[#FF4500] px-3 py-2 text-sm text-[#FF4500]"
         >
           지원 바로가기
         </Link>

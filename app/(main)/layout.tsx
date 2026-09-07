@@ -9,7 +9,7 @@ export default async function MainLayout({
 }) {
   return (
     <>
-      <Image src={Banner} alt="Content Image" className="w-[900px]" priority />
+      <Image src={Banner} alt="Content Image" className="w-225" priority />
 
       {children}
     </>

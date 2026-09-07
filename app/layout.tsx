@@ -20,7 +20,7 @@ export default function RootLayout({
     <html>
       <body className="flex flex-col items-center px-4">
         <Navbar />
-        <main className="mt-4 max-w-[900px]">{children}</main>
+        <main className="mt-4 max-w-225">{children}</main>
       </body>
       {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID && (
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID} />

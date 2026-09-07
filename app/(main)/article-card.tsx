@@ -21,10 +21,10 @@ export default function ArticleCard({
 }: WritingProps) {
   return (
     <Link
-      className="my-1 block h-[180px] pt-[24px] pb-[24px]"
+      className="my-1 block h-45 py-6"
       href={`/article/${pageId}/${title}`}
     >
-      <div className="flex justify-between gap-[36px]">
+      <div className="flex justify-between gap-9">
         <div className="flex flex-1 flex-col justify-between">
           <strong>{title}</strong>
           <p>{content}</p>

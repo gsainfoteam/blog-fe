@@ -19,7 +19,7 @@ export default async function CategorizedPage({
 
   return (
     <>
-      <div className="my-[20px]">
+      <div className="my-5">
         <CategoryList currentCategory={category} />
       </div>
 
