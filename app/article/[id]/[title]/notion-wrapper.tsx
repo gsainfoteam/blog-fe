@@ -39,7 +39,7 @@ export default function NotionWrapper({
   return (
     <div className="w-dvw">
       <NotionRenderer
-        className="selection:bg-[revert]!"
+        className="selection:bg-[revert]! [&_.notion-full-page]:py-4!"
         recordMap={recordMap}
         components={{
           Code,

@@ -3,6 +3,7 @@ import {
   getNotionData,
   getPermanentFileLink,
   getProperties,
+  getUser,
 } from "@/utils/notion";
 import { Metadata, ResolvedMetadata } from "next";
 import Link from "next/link";
@@ -42,11 +43,22 @@ export async function generateMetadata(
     ]?.[0][1][0][1];
   const description =
     page.properties[decodeURIComponent(properties["Summary"].id)]?.[0][0];
+  const writtenByIds: string[] =
+    page.properties[decodeURIComponent(properties["Written By"].id)]
+      ?.filter((item: unknown[]) => item?.length === 2)
+      .map((item: string[][][]) => item?.[1]?.[0]?.[1]) ?? [];
+  const writtenBy = await Promise.all(
+    writtenByIds.map((id) =>
+      getUser(id).then((user) => user.name ?? "Unknown User"),
+    ),
+  );
 
   return {
     title,
     description,
+    authors: writtenBy.map((name) => ({ name })),
     openGraph: {
+      authors: writtenBy,
       title: title,
       type: "article",
       images: thumbnail
@@ -60,15 +72,33 @@ export async function generateMetadata(
 export default async function DetailPage({ params }: Props) {
   const { id: pageId, title } = await params;
   const recordMap = await getPage(pageId);
+  const page = getBlockValue(
+    Object.values(recordMap.block).find(
+      (b) => getBlockValue(b.value)?.type === "page",
+    )!,
+  )!;
+  const properties = await getProperties();
+  const writtenByIds: string[] =
+    page.properties[decodeURIComponent(properties["Written By"].id)]
+      ?.filter((item: unknown[]) => item?.length === 2)
+      .map((item: string[][][]) => item?.[1]?.[0]?.[1]) ?? [];
+  const writtenBy = await Promise.all(
+    writtenByIds.map((id) =>
+      getUser(id).then((user) => user.name ?? "Unknown User"),
+    ),
+  );
   return (
     <div className="mb-32 flex flex-col items-center">
       <NotionWrapper recordMap={recordMap} />
-      <div className="mb-8 flex flex-col items-end">
-        <ShareButton
-          url={`https://blog.gistory.me/article/${pageId}/${title}`}
-        />
+      <div className="flex w-full max-w-(--notion-max-width) justify-between px-4">
+        <div>작성: {writtenBy.join(", ")}</div>
+        <div className="mb-8 flex flex-col items-end">
+          <ShareButton
+            url={`https://blog.gistory.me/article/${pageId}/${title}`}
+          />
+        </div>
       </div>
-      <div className="flex flex-col items-center gap-2">
+      <div className="mt-4 flex flex-col items-center gap-2">
         <h4>인포팀에서 함께 일하고 싶다면?</h4>
 
         <Link

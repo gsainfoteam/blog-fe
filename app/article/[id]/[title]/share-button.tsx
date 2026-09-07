@@ -19,7 +19,7 @@ export default function ShareButton({ url }: { url: string }) {
   };
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center gap-1">
       <FaLink />
       <button className="" onClick={handleCopyLink}>
         {copied ? "링크가 복사되었습니다!" : "공유하기"}

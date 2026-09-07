@@ -48,8 +48,12 @@ const getArticle = async (item: PageObjectResponse) => {
     throw new Error("Featured Image is not a files");
   const imageUrl = getFileUrl(properties["Featured Image"].files, item.id);
 
-  const userName = await getUser(item.created_by.id).then(
-    (user) => user.name ?? "Unknown User",
+  if (properties["Written By"].type !== "people")
+    throw new Error("Written By is not a people");
+  const userNames = await Promise.all(
+    properties["Written By"].people.map((user) =>
+      getUser(user.id).then((user) => user.name ?? "Unknown User"),
+    ),
   );
   const publishedTime =
     properties["Published Date"].type === "date"
@@ -61,7 +65,7 @@ const getArticle = async (item: PageObjectResponse) => {
     title: getTitle(item),
     text,
     imageUrl,
-    userName,
+    userNames,
     properties,
     createdTime: publishedTime ?? item.created_time.slice(0, 10),
   };
@@ -79,7 +83,7 @@ export default async function ArticleItem({
       title={content.title}
       content={content.text}
       date={content.createdTime}
-      writer={content.userName}
+      writer={content.userNames.join(", ")}
       pageId={content.id}
       imageUrl={content.imageUrl}
     />

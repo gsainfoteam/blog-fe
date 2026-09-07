@@ -20,10 +20,7 @@ export default function ArticleCard({
   imageUrl,
 }: WritingProps) {
   return (
-    <Link
-      className="my-1 block h-45 py-6"
-      href={`/article/${pageId}/${title}`}
-    >
+    <Link className="my-1 block h-45 py-6" href={`/article/${pageId}/${title}`}>
       <div className="flex justify-between gap-9">
         <div className="flex flex-1 flex-col justify-between">
           <strong>{title}</strong>
@@ -32,7 +29,7 @@ export default function ArticleCard({
             {date} {writer}
           </p>
         </div>
-        <div className="relative h-[90px] w-[130px]">
+        <div className="relative h-22.5 w-32.5">
           <Image
             src={imageUrl ?? DefaultImage}
             sizes="130px"
