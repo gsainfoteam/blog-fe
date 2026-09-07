@@ -52,12 +52,22 @@ export async function generateMetadata(
       getUser(id).then((user) => user.name ?? "Unknown User"),
     ),
   );
+  const tags: string[] =
+    page.properties[decodeURIComponent(properties["태그"].id)]?.[0][0].split(
+      ",",
+    ) ?? [];
+  const publishedDate =
+    page.properties[
+      decodeURIComponent(properties["Published Date"].id)
+    ]?.[0][1][0][1].start_date;
 
   return {
     title,
     description,
     authors: writtenBy.map((name) => ({ name })),
     openGraph: {
+      publishedTime: publishedDate,
+      tags,
       authors: writtenBy,
       title: title,
       type: "article",
@@ -87,17 +97,38 @@ export default async function DetailPage({ params }: Props) {
       getUser(id).then((user) => user.name ?? "Unknown User"),
     ),
   );
+  const tags: string[] =
+    page.properties[decodeURIComponent(properties["태그"].id)]?.[0][0].split(
+      ",",
+    ) ?? [];
+  const publishedDate =
+    page.properties[
+      decodeURIComponent(properties["Published Date"].id)
+    ]?.[0][1][0][1].start_date;
+
   return (
     <div className="mb-32 flex flex-col items-center">
-      <NotionWrapper recordMap={recordMap} />
-      <div className="flex w-full max-w-(--notion-max-width) justify-between px-4">
-        <div>작성: {writtenBy.join(", ")}</div>
-        <div className="mb-8 flex flex-col items-end">
-          <ShareButton
-            url={`https://blog.gistory.me/article/${pageId}/${title}`}
-          />
+      <div className="w-dvw max-w-(--notion-max-width) px-4 pb-10">
+        <h1 className="mb-5 text-4xl font-bold">{decodeURIComponent(title)}</h1>
+        <div className="mb-4 flex flex-col gap-2">
+          <div className="flex flex-col">
+            <div>작성: {writtenBy.join(", ")}</div>
+            <div>작성일: {publishedDate}</div>
+          </div>
+          <div className="flex gap-2">
+            {tags.map((tag) => (
+              <div
+                key={tag}
+                className="flex gap-2 rounded-full bg-[#FF4500] px-2 py-1 text-sm text-white"
+              >
+                #{tag}
+              </div>
+            ))}
+          </div>
         </div>
+        <NotionWrapper recordMap={recordMap} />
       </div>
+      <ShareButton url={`https://blog.gistory.me/article/${pageId}/${title}`} />
       <div className="mt-4 flex flex-col items-center gap-2">
         <h4>인포팀에서 함께 일하고 싶다면?</h4>
 

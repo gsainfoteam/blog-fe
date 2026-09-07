@@ -9,6 +9,7 @@ type WritingProps = {
   writer: string;
   pageId: string;
   imageUrl?: string;
+  tags: string[];
 };
 
 export default function ArticleCard({
@@ -18,6 +19,7 @@ export default function ArticleCard({
   writer,
   pageId,
   imageUrl,
+  tags,
 }: WritingProps) {
   return (
     <Link className="my-1 block h-45 py-6" href={`/article/${pageId}/${title}`}>
@@ -28,6 +30,16 @@ export default function ArticleCard({
           <p>
             {date} {writer}
           </p>
+          <div className="mt-2 flex gap-2">
+            {tags.map((tag) => (
+              <div
+                key={tag}
+                className="flex gap-2 rounded-full bg-[#FF4500] px-2 py-1 text-sm text-white"
+              >
+                #{tag}
+              </div>
+            ))}
+          </div>
         </div>
         <div className="relative h-22.5 w-32.5">
           <Image

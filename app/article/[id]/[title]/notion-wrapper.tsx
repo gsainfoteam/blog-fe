@@ -37,23 +37,23 @@ export default function NotionWrapper({
   recordMap: ExtendedRecordMap;
 }) {
   return (
-    <div className="w-dvw">
-      <NotionRenderer
-        className="selection:bg-[revert]! [&_.notion-full-page]:py-4!"
-        recordMap={recordMap}
-        components={{
-          Code,
-          Collection: () => null,
-          Equation,
-          Modal,
-          nextImage: Image,
-          nextLink: Link,
-          PageLink,
-        }}
-        disableHeader
-        fullPage={true}
-        darkMode={false}
-      />
-    </div>
+    <NotionRenderer
+      pageTitle={<></>}
+      className="selection:bg-[revert]! [&_.notion-title]:hidden"
+      bodyClassName="p-0! m-0!"
+      recordMap={recordMap}
+      components={{
+        Code,
+        Collection: () => null,
+        Equation,
+        Modal,
+        nextImage: Image,
+        nextLink: Link,
+        PageLink,
+      }}
+      disableHeader
+      fullPage={true}
+      darkMode={false}
+    />
   );
 }

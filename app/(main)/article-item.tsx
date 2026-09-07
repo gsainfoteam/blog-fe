@@ -59,6 +59,9 @@ const getArticle = async (item: PageObjectResponse) => {
     properties["Published Date"].type === "date"
       ? properties["Published Date"].date?.start
       : undefined;
+  if (properties["태그"].type !== "multi_select")
+    throw new Error("태그 is not a multi_select");
+  const tags = properties["태그"].multi_select.map((tag) => tag.name);
 
   return {
     id: item.id,
@@ -68,6 +71,7 @@ const getArticle = async (item: PageObjectResponse) => {
     userNames,
     properties,
     createdTime: publishedTime ?? item.created_time.slice(0, 10),
+    tags,
   };
 };
 
@@ -86,6 +90,7 @@ export default async function ArticleItem({
       writer={content.userNames.join(", ")}
       pageId={content.id}
       imageUrl={content.imageUrl}
+      tags={content.tags}
     />
   );
 }
