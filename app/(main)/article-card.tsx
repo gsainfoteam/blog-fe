@@ -21,18 +21,18 @@ export default function ArticleCard({
 }: WritingProps) {
   return (
     <Link
-      className="h-[180px] pt-[24px] pb-[24px] block my-1"
+      className="my-1 block h-[180px] pt-[24px] pb-[24px]"
       href={`/article/${pageId}/${title}`}
     >
-      <div className="flex gap-[36px] justify-between">
-        <div className="flex flex-col justify-between flex-1">
+      <div className="flex justify-between gap-[36px]">
+        <div className="flex flex-1 flex-col justify-between">
           <strong>{title}</strong>
           <p>{content}</p>
           <p>
             {date} {writer}
           </p>
         </div>
-        <div className="relative w-[130px] h-[90px]">
+        <div className="relative h-[90px] w-[130px]">
           <Image
             src={imageUrl ?? DefaultImage}
             sizes="130px"

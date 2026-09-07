@@ -38,7 +38,7 @@ export default function NotionWrapper({
   recordMap: ExtendedRecordMap;
 }) {
   return (
-    <div className="w-dvw ">
+    <div className="w-dvw">
       <NotionRenderer
         className="selection:bg-[revert]!"
         recordMap={recordMap}

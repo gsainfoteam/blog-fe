@@ -16,7 +16,7 @@ export default function CategoryButton({
   return (
     <Link href={`/${category.url}`} className="mr-[15px]">
       <button
-        className={`w-[61px] h-[43px] p-[12px] rounded-[24px] text-sm cursor-pointer ${
+        className={`h-[43px] w-[61px] cursor-pointer rounded-[24px] p-[12px] text-sm ${
           selected ? "bg-[#FF4500] text-white" : "bg-[#E8E8E8] text-gray-600"
         }`}
       >

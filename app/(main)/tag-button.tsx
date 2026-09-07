@@ -9,7 +9,7 @@ export default function TagButton({
 }) {
   return (
     <Link
-      className="flex items-center bg-[#F1F1F1] rounded-[10px] h-[33px] px-[8px] py-[14px]"
+      className="flex h-[33px] items-center rounded-[10px] bg-[#F1F1F1] px-[8px] py-[14px]"
       href={`/main/${currentCategory}/${tag}`}
     >
       {tag}

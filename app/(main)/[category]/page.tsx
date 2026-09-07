@@ -14,7 +14,7 @@ export default async function CategorizedPage({
   const { category, tags } = await params;
   const response = await getNotionData(
     category as Category,
-    tags === undefined ? null : tags[0]
+    tags === undefined ? null : tags[0],
   );
 
   return (

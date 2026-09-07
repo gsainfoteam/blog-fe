@@ -61,9 +61,9 @@ export default async function DetailPage({ params }: Props) {
   const { id: pageId, title } = await params;
   const recordMap = await getPage(pageId);
   return (
-    <div className="flex flex-col items-center mb-32">
+    <div className="mb-32 flex flex-col items-center">
       <NotionWrapper recordMap={recordMap} />
-      <div className="flex flex-col items-end mb-8">
+      <div className="mb-8 flex flex-col items-end">
         <ShareButton
           url={`https://blog.gistory.me/article/${pageId}/${title}`}
         />
@@ -73,7 +73,7 @@ export default async function DetailPage({ params }: Props) {
 
         <Link
           href="/"
-          className="text-sm px-[12px] py-[8px] rounded-[5px] border-2 border-[#FF4500] text-[#FF4500]"
+          className="rounded-[5px] border-2 border-[#FF4500] px-[12px] py-[8px] text-sm text-[#FF4500]"
         >
           지원 바로가기
         </Link>
