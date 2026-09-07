@@ -13,6 +13,7 @@ export default function CategoryList({
     { content: "전체", url: "" },
     { content: "기술", url: "tech" },
     { content: "문화", url: "culture" },
+    { content: "회고", url: "review" },
   ];
   const currentFilter: boolean[] = [];
   for (const elm of category) {
