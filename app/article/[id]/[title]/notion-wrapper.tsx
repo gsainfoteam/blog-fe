@@ -12,7 +12,6 @@ import "katex/dist/katex.min.css";
 
 import { Equation } from "react-notion-x/build/third-party/equation";
 import { Modal } from "react-notion-x/build/third-party/modal";
-import { Pdf } from "react-notion-x/build/third-party/pdf";
 import { Code } from "./code-with-mermaid";
 import Image from "next/image";
 import Link from "next/link";
@@ -47,7 +46,6 @@ export default function NotionWrapper({
           Collection: () => null,
           Equation,
           Modal,
-          Pdf,
           nextImage: Image,
           nextLink: Link,
           PageLink,
